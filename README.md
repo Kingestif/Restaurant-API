@@ -80,7 +80,7 @@ A RESTful API for managing a restaurant system — complete with authentication,
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/your-username/restaurant-api.git
+git clone https://github.com/Kingestif/Restaurant-API.git
 cd restaurant-api
 
 # 2. Install dependencies
