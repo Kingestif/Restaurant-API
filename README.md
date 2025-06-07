@@ -87,7 +87,7 @@ cd restaurant-api
 npm install
 
 # 3. Create .env file
-cp .env.example .env
+cp .env
 # Add your MongoDB URI, JWT secret, and other configs in the .env
 
 # 4. Start the development server
