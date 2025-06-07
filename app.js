@@ -6,7 +6,9 @@ const userRouter = require('./routes/userRoutes');
 const orderRouter = require('./routes/orderRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const morgan = require('morgan');
+const cors = require('cors');
 
+app.use(cors());
 app.use(morgan('dev')); 
 app.use(express.json());
 
