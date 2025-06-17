@@ -137,4 +137,4 @@ router.route('/').get(protect, isAdmin, viewAllUsers);
  */
 router.route('/:id').get(protect, isAdmin, viewUserProfile).patch(protect, isAdmin, updateUserRole).delete(protect, isAdmin, deleteUser);
 
-module.exports = router;
+export default router;

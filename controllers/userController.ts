@@ -1,6 +1,7 @@
-const User = require('../models/users');
+import User from '../models/users';
+import { Request, Response } from 'express';
 
-exports.viewAllUsers = async(req, res) => {
+export const viewAllUsers = async(req:Request, res:Response) => {
     try{
         const user = await User.find();
 
@@ -10,14 +11,19 @@ exports.viewAllUsers = async(req, res) => {
             data: user
         });
     }catch(error){
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
         return res.status(500).json({
             status: "error",
-            message: "Failed to fetch users"
+            message: message
         });
     }
 }
 
-exports.viewUserProfile = async(req, res) => {
+export const viewUserProfile = async(req:Request, res:Response) => {
     try{
         const user = await User.findById(req.params.id);
 
@@ -27,16 +33,20 @@ exports.viewUserProfile = async(req, res) => {
             data: user
         });
     }catch(error){
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
         return res.status(500).json({
             status: "error",
-            message: "Failed to fetch the user"
+            message: message
         });
-        
     }
 }
 
 
-exports.updateUserRole = async(req, res) => {
+export const updateUserRole = async(req:Request, res:Response) => {
     try{
         const updateData = req.body;
         
@@ -52,25 +62,33 @@ exports.updateUserRole = async(req, res) => {
         });
 
     }catch(error){
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
         return res.status(500).json({
             status: "error",
-            message: "Failed to update user"
+            message: message
         });
-        
     }
 }
 
 
-exports.deleteUser = async(req, res) => {
+export const deleteUser = async(req:Request, res:Response) => {
     try{
         await User.findByIdAndDelete(req.params.id);
         return res.status(204).json();
 
     }catch(error){
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
         return res.status(500).json({
             status: "error",
-            message: "Failed to fetch the user",
-            error: error.message
+            message: message
         });
     }
 }

@@ -109,4 +109,4 @@ router.route('/').post(protect, isCustomer, placeOrder).get(protect, isCustomer,
  */
 router.route('/all').get(protect, isManager, getAllOrders);
 
-module.exports = router;
+export default router;

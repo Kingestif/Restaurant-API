@@ -1,6 +1,7 @@
-const Menu = require('../models/menu');
+import Menu from '../models/menu';
+import {Request, Response} from 'express';
 
-exports.getMenu = async(req, res) => {
+export const getMenu = async(req:Request, res:Response) => {
     try{
         const menu = await Menu.find();
         return res.status(200).json({
@@ -10,15 +11,19 @@ exports.getMenu = async(req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
+        return res.status(500).json({
             status: "error",
-            message: "Failed to fetch menus",
-            error: error.message
+            message: message
         });
     }
 }
 
-exports.postMenu = async(req, res) => {
+export const postMenu = async(req:Request, res:Response) => {
     try{
         const {name, description, price, category, available} = req.body;
         if (!name || price == null) {
@@ -38,15 +43,19 @@ exports.postMenu = async(req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
+        return res.status(500).json({
             status: "error",
-            message: "Failed to create menu",
-            error: error.message
+            message: message
         });
     }
 }
 
-exports.editMenu = async(req, res) => {
+export const editMenu = async(req:Request, res:Response) => {
     try{
         const updateData = req.body;
 
@@ -62,24 +71,32 @@ exports.editMenu = async(req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
+        return res.status(500).json({
             status: "error",
-            message: "Failed to update menu",
-            error: error.message
+            message: message
         });
     }
 }
 
-exports.deleteMenu = async(req, res) => {
+export const deleteMenu = async(req:Request, res:Response) => {
     try{
         await Menu.findByIdAndDelete(req.params.id);
         return res.status(204).json();
         
     }catch(error){
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
         return res.status(500).json({
             status: "error",
-            message: "Failed to delete Menu",
-            error: error.message
+            message: message
         });
     }
 }

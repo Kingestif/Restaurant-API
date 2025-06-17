@@ -1,10 +1,11 @@
-const Menu = require('../models/menu');
-const Order = require('../models/order');
+import Menu from '../models/menu';
+import Order from '../models/order';
+import {Request, Response} from 'express';
 
-exports.placeOrder = async(req, res) => {
+export const placeOrder = async(req:Request, res:Response) => {
     try{
         const {items} = req.body;
-        const customer = req.user._id;
+        const customer = req.user!._id;
 
         let subtotal = 0;
         
@@ -37,17 +38,21 @@ exports.placeOrder = async(req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
+        return res.status(500).json({
             status: "error",
-            message: "Failed to place an order",
-            error: error.message
+            message: message
         });
     }
 }
 
-exports.getOrder = async(req, res) => {
+export const getOrder = async(req:Request, res:Response) => {
     try{
-        const userId = req.user._id;
+        const userId = req.user!._id;
 
         const order = await Order.find({ customer: userId })
             .populate('items.product', 'name price')
@@ -60,16 +65,20 @@ exports.getOrder = async(req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
+        return res.status(500).json({
             status: "error",
-            message: "Failed to fetch users order",
-            error: error.message
+            message: message
         });
     }
 }
 
 
-exports.getAllOrders = async(req, res) => {
+export const getAllOrders = async(req:Request, res:Response) => {
     try{
         const orders = await Order.find()
             .populate('customer', 'name email') 
@@ -83,10 +92,14 @@ exports.getAllOrders = async(req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({
+        let message = "An unknown error happend";
+        if(error instanceof Error){
+            message = error.message;
+        }
+
+        return res.status(500).json({
             status: "error",
-            message: "Failed to fetch orders",
-            error: error.message
+            message: message
         });
     }
 }
