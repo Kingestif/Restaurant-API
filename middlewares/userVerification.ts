@@ -24,7 +24,11 @@ export const protect = async(req:Request, res:Response, next: NextFunction) =>{
             throw new Error("JWT_SECRET environment variable is not set");
         }
 
-        const decoded = jwt.verify(token, JWT_SECRET) as any;    
+        const decoded = jwt.verify(token, JWT_SECRET);    
+
+        if(typeof decoded==="string"){
+            return;
+        }
 
         const isalive = await User.findById(decoded.id);
 
