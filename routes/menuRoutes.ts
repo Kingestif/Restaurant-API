@@ -145,4 +145,4 @@ router.route('/').get(protect, getMenu).post(protect, isManager, postMenu);
  */
 router.route('/:id').patch(protect, isManager, editMenu).delete(protect, isManager, deleteMenu);
 
-module.exports = router;  
+export default router;  

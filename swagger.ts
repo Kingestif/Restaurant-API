@@ -1,5 +1,6 @@
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import {Express} from "express";
 
 const options = {
     definition: {
@@ -38,9 +39,9 @@ const options = {
 
 const swaggerSpec = swaggerJsdoc(options);
 
-const swaggerDocs = (app) => {
+const swaggerDocs = (app: Express) => {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     console.log("Swagger Docs available at https://restaurant-api-27es.onrender.com/api-docs");
 };
 
-module.exports = swaggerDocs; 
+export default swaggerDocs; 

@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {bookTable, getMyBookings, getAllBookings} = require('../controllers/bookingController');
-const {protect, isCustomer, isManager} = require('../middlewares/userVerification');
+import { bookTable, getMyBookings, getAllBookings } from '../controllers/bookingController';
+import { protect, isCustomer, isManager } from '../middlewares/userVerification';
 
 /**
  * @swagger
@@ -85,4 +85,4 @@ const {protect, isCustomer, isManager} = require('../middlewares/userVerificatio
 router.route('/').post(protect, isCustomer, bookTable).get(protect, isManager, getAllBookings);
 router.route('/me').get(protect, isCustomer, getMyBookings);
 
-module.exports = router;
+export default router;

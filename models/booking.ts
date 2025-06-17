@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const BookSchema = new mongoose.Schema({
+const BookSchema = new Schema({
     customer: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },
@@ -27,4 +27,4 @@ const BookSchema = new mongoose.Schema({
     { timestamps: true }
 );
 
-module.exports = mongoose.model('Booking', BookSchema);
+export default model('Booking', BookSchema);
