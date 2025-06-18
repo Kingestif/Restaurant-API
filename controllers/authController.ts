@@ -1,12 +1,12 @@
 import User from '../models/users';
 import jwt from 'jsonwebtoken';
 import {Request, Response} from 'express';
+import userValidation from '../validation/userValidation';
 
 export const signup = async(req:Request,res:Response)=>{
     
     try{
-        const {email, password, role} = req.body;
-        console.log(email);
+        const {email, password, role} = userValidation.parse(req.body);
         const newuser = await User.create({email, password, role});
         
         await newuser.save();
