@@ -36,11 +36,6 @@ const UserSchema = new Schema<IUser>({
     { timestamps: true }
 );
 
-UserSchema.pre('save', async function(next){        
-    if(!this.isModified('password')) return next();
-    this.password = await hash(this.password, 12);
-});
-
 UserSchema.methods.checkPassword = function(givenPassword:string){
     console.log(this.password, givenPassword);
     return compare(givenPassword, this.password);

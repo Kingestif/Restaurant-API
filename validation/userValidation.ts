@@ -8,4 +8,6 @@ const userValidation = z.object({
   })
 }); 
 
+export type UserValidationType = z.infer<typeof userValidation>;  //we can then use this as a type
+
 export default userValidation;
