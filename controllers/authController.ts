@@ -5,14 +5,20 @@ import { UserEntity } from '../entity/user';
 import { UserRepository } from '../repository/userRepository';
 import userValidation from '../validation/userValidation';
 import bcrypt from 'bcrypt';
-import { signupService } from '../services/authService';
+import { signupService } from '../services/auth/signupService';
 
 //controllers only concerned with getting request, validating, calling the right service & sending response back
 export const signup = async (req: Request, res: Response) => {
     try {
+        const deps = {
+            userRepository: new UserRepository(),   //used to do on service layer but on clearn architecture we inject it here
+            bcrypt,
+            UserEntity
+        };
+
         const input = userValidation.parse(req.body);
 
-        const user = await signupService(input);
+        const user = await signupService(deps, input);
 
         res.status(201).json({
             status: 'success',
