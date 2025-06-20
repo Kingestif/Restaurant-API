@@ -59,30 +59,7 @@ import { signup, login } from '../controllers/authController';
  *       500:
  *         description: Server error
  */
-router.route('/register').post(async(req, res) => {
-    try{
-        const newuser = await signup(req.body.email, req.body.password, req.body.role);
-        res.status(201).json({
-            status: 'success',
-            message: 'User registered successfully',
-            user: {
-                email: newuser.email,
-                role: newuser.role
-            }   
-        });
-
-    }catch(error:unknown){
-        let message = "An unknown error occurred";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: 'error',
-            message: message
-        });
-    }
-});
+router.route('/register').post(signup);
 
 /**
  * @swagger

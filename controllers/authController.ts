@@ -7,23 +7,32 @@ import userValidation from '../validation/userValidation';
 import bcrypt from 'bcrypt';
 import { signupService } from '../services/authService';
 
-//controllers only concerned with getting request and sending response and validation
-export const signup = async (email: string, password: string, role: string) => {
-
+//controllers only concerned with getting request, validating, calling the right service & sending response back
+export const signup = async (req: Request, res: Response) => {
     try {
-        const input = userValidation.parse({ email, password, role });
+        const input = userValidation.parse(req.body);
 
-        const user = await signupService(input)
+        const user = await signupService(input);
 
-        return user;
+        res.status(201).json({
+            status: 'success',
+            message: 'User registered successfully',
+            user: {
+                email: user.email,
+                role: user.role
+            }   
+        });
 
     } catch (error: unknown) {
-        let message = "An unknown error occured";
-        if (error instanceof Error) {
+        let message = "An unknown error occurred";
+        if(error instanceof Error){
             message = error.message;
         }
 
-        throw new Error(message);
+        res.status(500).json({
+            status: 'error',
+            message: message
+        });
     }
 }
 
