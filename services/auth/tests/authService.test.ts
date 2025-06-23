@@ -1,0 +1,60 @@
+import { signupService } from "../signupService";
+import { UserDTO } from "../../../dto/userDTO";
+import { UserEntity } from "../../../entity/user";
+
+describe("signupServie", () => {
+    it("throws error if user with email exists", async () => {
+        const input = {
+            email: "fakeuser@example.com",
+            password: "plainPass",
+            role: "admin" as "admin"
+        }
+        const deps = {
+            userRepository: {   
+                // *returns promise that resolves to an existing user (pretending the database found an existing user.)
+                findByEmail: jest.fn().mockResolvedValue({ email: "exists@example.com" }),  
+                save: jest.fn(),
+            },
+            UserEntity,
+            hashRepository: {
+                hash: jest.fn(),
+                compare: jest.fn(),
+            }
+        }
+
+        await expect(signupService(deps, input)).rejects.toThrow("User with this email already exists");
+    });
+
+    it("correctly hashes, creates user and returns without password", async () => {
+        const input = {
+            email: "fakeuser@example.com",
+            password: "plainPass",
+            role: "admin" as const
+        }
+        
+        const deps = {
+            userRepository: {
+                findByEmail: jest.fn().mockResolvedValue(null), // OR async ()=> null, just means users doesn't exist
+                save: async (user: any) => {
+                    return new UserEntity(user.email, user.getPassword(), user.role);
+                }
+            },
+
+            UserEntity,
+
+            hashRepository: {
+                hash: async()=> "hashedPass",
+                compare: async()=> true,
+            }
+        }
+
+        const result = await signupService(deps, input);
+
+        expect(result).toEqual({
+            email: "fakeuser@example.com",
+            role: "admin"
+        });
+
+        // TIP: read it like "if input was this, then our user repo findbyemail return null(no duplicate), if .save returns the user, if we pass real UserEntity, if hash return hashedPass then will the result be same as we exptected"
+    });
+})
