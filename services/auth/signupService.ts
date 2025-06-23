@@ -1,3 +1,4 @@
+import { UserDTO } from "../../dto/userDTO";
 import { UserValidationType } from "../../validation/userValidation";
 import {SignupDeps} from "./authServiceDeps";
 
@@ -13,5 +14,6 @@ export const signupService = async (deps: SignupDeps, { email, password, role }:
     const hashedPassword = await hashRepository.hash(password, 12);
     const userEntity = new UserEntity(email, hashedPassword, role);
     const user = await userRepository.save(userEntity);
-    return user;
+
+    return new UserDTO(user);       //instead of just saying return user, we return a DTO that does not include password field
 }

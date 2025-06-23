@@ -23,10 +23,7 @@ export const signup = async (req: Request, res: Response) => {
         res.status(201).json({
             status: 'success',
             message: 'User registered successfully',
-            user: {
-                email: user.email,
-                role: user.role
-            }   
+            user
         });
 
     } catch (error: unknown) {
