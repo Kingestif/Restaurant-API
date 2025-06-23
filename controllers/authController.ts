@@ -4,16 +4,16 @@ import { Request, Response } from 'express';
 import { UserEntity } from '../entity/user';
 import { UserRepository } from '../repository/userRepository';
 import userValidation from '../validation/userValidation';
-import bcrypt from 'bcrypt';
 import { signupService } from '../services/auth/signupService';
+import { BcryptHashRepository } from '../repository/hashRepository';
 
 //controllers only concerned with getting request, validating, calling the right service & sending response back
 export const signup = async (req: Request, res: Response) => {
     try {
         const deps = {
-            userRepository: new UserRepository(),   //used to do on service layer but on clearn architecture we inject it here
-            bcrypt,
-            UserEntity
+            userRepository: new UserRepository(),   //(those initalized on serviceDeps), we used to do this on service layer but on clean architecture we initialize them here
+            UserEntity,
+            hashRepository: new BcryptHashRepository() 
         };
 
         const input = userValidation.parse(req.body);

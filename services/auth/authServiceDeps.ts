@@ -1,10 +1,9 @@
 import { UserEntity } from '../../entity/user';
+import { HashRepository } from '../../repository/hashRepository';
 import { IUserRepository } from '../../repository/IUserRepository';
 
 export interface SignupDeps {
   userRepository: IUserRepository;
-  bcrypt: typeof import('bcrypt');
   UserEntity: typeof UserEntity;
+  hashRepository: HashRepository;
 }
-
-// This interface describes the dependencies required for the signup service.
