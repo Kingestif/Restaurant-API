@@ -2,7 +2,7 @@ import User from '../models/users';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import userValidation from '../validation/userValidation';
-import { AuthenticationService } from '../services/auth/signupService';
+import { AuthenticationService } from '../services/auth/authService';
 import { BcryptHashRepository } from '../repository/hashRepository';
 import { UserRepository } from '../repository/userRepository';
 

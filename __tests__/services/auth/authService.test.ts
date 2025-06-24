@@ -1,4 +1,4 @@
-import { AuthenticationService } from "../signupService";
+import { AuthenticationService } from "../../../services/auth/authService";
 
 describe("signupServie", () => {
     it("throws error if user with email exists", async () => {
