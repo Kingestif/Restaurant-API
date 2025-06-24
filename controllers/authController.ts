@@ -2,10 +2,10 @@ import User from '../models/users';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { UserEntity } from '../entity/user';
-import { UserRepository } from '../repository/userRepository';
 import userValidation from '../validation/userValidation';
-import { signupService } from '../services/auth/signupService';
+import { AuthenticationService } from '../services/auth/signupService';
 import { BcryptHashRepository } from '../repository/hashRepository';
+import { UserRepository } from '../repository/userRepository';
 
 //controllers only concerned with getting request, validating, calling the right service & sending response back
 export const signup = async (req: Request, res: Response) => {
@@ -13,12 +13,14 @@ export const signup = async (req: Request, res: Response) => {
         const deps = {
             userRepository: new UserRepository(),   //(those initalized on serviceDeps), we used to do this on service layer but on clean architecture we initialize them here
             UserEntity,
-            hashRepository: new BcryptHashRepository() 
+            hashRepository: new BcryptHashRepository()
         };
 
         const input = userValidation.parse(req.body);
-
-        const user = await signupService(deps, input);
+        const authenticationService = new AuthenticationService(deps.userRepository, deps.hashRepository)
+        
+        // const user = await signupService(deps, input);   //without class #1
+        const user = await authenticationService.signUp(input)
 
         res.status(201).json({
             status: 'success',
@@ -28,7 +30,7 @@ export const signup = async (req: Request, res: Response) => {
 
     } catch (error: unknown) {
         let message = "An unknown error occurred";
-        if(error instanceof Error){
+        if (error instanceof Error) {
             message = error.message;
         }
 
@@ -42,7 +44,6 @@ export const signup = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password);
 
         if (!email || !password) {
             res.status(401).json({

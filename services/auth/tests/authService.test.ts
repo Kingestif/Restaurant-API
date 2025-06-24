@@ -1,5 +1,4 @@
-import { signupService } from "../signupService";
-import { UserDTO } from "../../../dto/userDTO";
+import { AuthenticationService } from "../signupService";
 import { UserEntity } from "../../../entity/user";
 
 describe("signupServie", () => {
@@ -21,8 +20,9 @@ describe("signupServie", () => {
                 compare: jest.fn(),
             }
         }
+        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository);
 
-        await expect(signupService(deps, input)).rejects.toThrow("User with this email already exists");
+        await expect(authService.signUp(input)).rejects.toThrow("User with this email already exists");
     });
 
     it("correctly hashes, creates user and returns without password", async () => {
@@ -48,11 +48,14 @@ describe("signupServie", () => {
             }
         }
 
-        const result = await signupService(deps, input);
+        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository);
 
-        expect(result).toEqual({
+        const result = await authService.signUp(input);
+
+        //we test if our DTO is working by checking password is not returned
+        expect(result).toEqual({        
             email: "fakeuser@example.com",
-            role: "admin"
+            role: "admin",
         });
 
         // TIP: read it like "if input was this, then our user repo findbyemail return null(no duplicate), if .save returns the user, if we pass real UserEntity, if hash return hashedPass then will the result be same as we exptected"
