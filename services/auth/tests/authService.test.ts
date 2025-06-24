@@ -1,5 +1,4 @@
 import { AuthenticationService } from "../signupService";
-import { UserEntity } from "../../../entity/user";
 
 describe("signupServie", () => {
     it("throws error if user with email exists", async () => {
@@ -14,7 +13,6 @@ describe("signupServie", () => {
                 findByEmail: jest.fn().mockResolvedValue({ email: "exists@example.com" }),  
                 save: jest.fn(),
             },
-            UserEntity,
             hashRepository: {
                 hash: jest.fn(),
                 compare: jest.fn(),
@@ -36,11 +34,13 @@ describe("signupServie", () => {
             userRepository: {
                 findByEmail: jest.fn().mockResolvedValue(null), // OR async ()=> null, just means users doesn't exist
                 save: async (user: any) => {
-                    return new UserEntity(user.email, user.getPassword(), user.role);
+                    return {
+                        email: user.email,
+                        password: user.password,
+                        role: user.role
+                    }
                 }
             },
-
-            UserEntity,
 
             hashRepository: {
                 hash: async()=> "hashedPass",
@@ -55,7 +55,7 @@ describe("signupServie", () => {
         //we test if our DTO is working by checking password is not returned
         expect(result).toEqual({        
             email: "fakeuser@example.com",
-            role: "admin",
+            role: "admin"
         });
 
         // TIP: read it like "if input was this, then our user repo findbyemail return null(no duplicate), if .save returns the user, if we pass real UserEntity, if hash return hashedPass then will the result be same as we exptected"

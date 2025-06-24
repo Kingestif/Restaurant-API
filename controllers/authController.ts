@@ -1,7 +1,6 @@
 import User from '../models/users';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import { UserEntity } from '../entity/user';
 import userValidation from '../validation/userValidation';
 import { AuthenticationService } from '../services/auth/signupService';
 import { BcryptHashRepository } from '../repository/hashRepository';
@@ -12,7 +11,6 @@ export const signup = async (req: Request, res: Response) => {
     try {
         const deps = {
             userRepository: new UserRepository(),   //(those initalized on serviceDeps), we used to do this on service layer but on clean architecture we initialize them here
-            UserEntity,
             hashRepository: new BcryptHashRepository()
         };
 

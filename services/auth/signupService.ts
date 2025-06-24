@@ -1,7 +1,7 @@
 import { UserDTO } from "../../dto/userDTO";
-import { UserEntity } from "../../entity/user";
 import { HashRepository } from "../../repository/hashRepository";
 import { IUserRepository, UserRepository } from "../../repository/userRepository";
+import { Usertype } from "../../types/user";
 import { UserValidationType } from "../../validation/userValidation";
 // import { SignupDeps } from "./authServiceDeps";
 
@@ -42,9 +42,14 @@ export class AuthenticationService {
 
         const hashedPassword = await this.hashRepository.hash(password, 12);
 
-        const userEntity = new UserEntity(email, hashedPassword, role);
-        const user = await this.userRepository.save(userEntity);
+        const user: Usertype = {
+            email,
+            password: hashedPassword,
+            role
+        }
 
-        return new UserDTO(user);
+        const savedUser = await this.userRepository.save(user);
+
+        return new UserDTO(savedUser);
     }
 }
