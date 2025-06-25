@@ -16,9 +16,14 @@ describe("signupServie", () => {
             hashRepository: {
                 hash: jest.fn(),
                 compare: jest.fn(),
+            },
+
+            tokenRepository: {
+                generateToken: jest.fn(),
+                // verifyToken: jest.fn(),
             }
         }
-        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository);
+        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository, deps.tokenRepository);
 
         await expect(authService.signUp(input)).rejects.toThrow("User with this email already exists");
     });
@@ -45,10 +50,15 @@ describe("signupServie", () => {
             hashRepository: {
                 hash: async()=> "hashedPass",
                 compare: async()=> true,
+            },
+
+            tokenRepository: {
+                generateToken: jest.fn(),
+                // verifyToken: jest.fn(),
             }
         }
 
-        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository);
+        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository, deps.tokenRepository);
 
         const result = await authService.signUp(input);
 

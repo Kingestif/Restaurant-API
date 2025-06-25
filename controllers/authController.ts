@@ -1,21 +1,31 @@
 import User from '../models/users';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import userValidation from '../validation/userValidation';
+import signupValidation from '../validation/signupValidation';
 import { AuthenticationService } from '../services/auth/authService';
 import { BcryptHashRepository } from '../repository/hashRepository';
 import { UserRepository } from '../repository/userRepository';
+import signInValidation from '../validation/signinValidation';
+import { JwtTokenRepository } from '../repository/tokenRepository';
 
 //controllers only concerned with getting request, validating, calling the right service & sending response back
 export const signup = async (req: Request, res: Response) => {
     try {
+        const JWT_SECRET = process.env.JWT_SECRET;
+        const JWT_EXPIRE = Number(process.env.JWT_EXPIRE);
+
+        if(!JWT_SECRET || !JWT_EXPIRE) {
+            throw new Error("JWT_SECRET or JWT_EXPIRE environment variable is not set");
+        }   
+        
         const deps = {
             userRepository: new UserRepository(),   //(those initalized on serviceDeps), we used to do this on service layer but on clean architecture we initialize them here
-            hashRepository: new BcryptHashRepository()
+            hashRepository: new BcryptHashRepository(),
+            tokenRepository: new JwtTokenRepository(JWT_SECRET, JWT_EXPIRE)
         };
 
-        const input = userValidation.parse(req.body);
-        const authenticationService = new AuthenticationService(deps.userRepository, deps.hashRepository)
+        const input = signupValidation.parse(req.body);
+        const authenticationService = new AuthenticationService(deps.userRepository, deps.hashRepository, deps.tokenRepository);
         
         // const user = await signupService(deps, input);   //without class #1
         const user = await authenticationService.signUp(input)
@@ -41,43 +51,27 @@ export const signup = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
-        const { email, password } = req.body;
+        const JWT_SECRET = process.env.JWT_SECRET;
+        const JWT_EXPIRE = Number(process.env.JWT_EXPIRE);
 
-        if (!email || !password) {
-            res.status(401).json({
-                status: "error",
-                message: "Please Provide email and password",
-            });
-            return;
-        }
+        if(!JWT_SECRET || !JWT_EXPIRE) {
+            throw new Error("JWT_SECRET or JWT_EXPIRE environment variable is not set");
+        }   
+        
+        const deps = {
+            userRepository: new UserRepository(),  
+            hashRepository: new BcryptHashRepository(),
+            tokenRepository: new JwtTokenRepository(JWT_SECRET, JWT_EXPIRE)     //* instead of passing JWT_SECRET and JWT_EXPIRE to service, we pass it to the tokenRepository to initialize it then whenever our service calls the generateToken method, it will use the secret and expire time from the tokenRepository
+        };
 
-        const user = await User.findOne({ email }).select('+password');
+        const input = signInValidation.parse(req.body);
 
-        if (!user || !await user.checkPassword(password)) {
-            res.status(500).json({
-                status: "error",
-                message: "Incorrect email or password",
-            });
-            return;
-        }
-
-        const JWT_SECRET = process.env.JWT_SECRET!;
-        const JWT_EXPIRE = Number(process.env.JWT_EXPIRE)
-
-        if (!JWT_SECRET) {
-            throw new Error("JWT_SECRET environment variable is not set");
-        }
-
-        const token = jwt.sign({ id: user._id }, JWT_SECRET, {
-            expiresIn: JWT_EXPIRE ?? ""
-        });
-
-        await user.save();
+        const authenticationService = new AuthenticationService(deps.userRepository, deps.hashRepository, deps.tokenRepository);
+        const token = await authenticationService.signIn(input);
 
         res.status(200).json({
-            status: "success",
+            status: "successfully logged in",
             token: token,
-            role: user.role
         });
 
     } catch (error) {
@@ -85,6 +79,7 @@ export const login = async (req: Request, res: Response) => {
         if (error instanceof Error) {
             message = error.message;
         }
+        console.log(message);
 
         res.status(500).json({
             status: "error",
