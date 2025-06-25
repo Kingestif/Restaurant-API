@@ -23,7 +23,7 @@ describe("signupServie", () => {
                 // verifyToken: jest.fn(),
             }
         }
-        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository, deps.tokenRepository);
+        const authService = new AuthenticationService(deps);
 
         await expect(authService.signUp(input)).rejects.toThrow("User with this email already exists");
     });
@@ -58,7 +58,7 @@ describe("signupServie", () => {
             }
         }
 
-        const authService = new AuthenticationService(deps.userRepository, deps.hashRepository, deps.tokenRepository);
+        const authService = new AuthenticationService(deps);
 
         const result = await authService.signUp(input);
 

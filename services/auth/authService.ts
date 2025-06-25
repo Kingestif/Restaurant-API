@@ -1,20 +1,21 @@
 import { UserDTO } from "../../dto/userDTO";
 import { HashRepository } from "../../repository/hashRepository";
 import { TokenRepository } from "../../repository/tokenRepository";
-import { IUserRepository, UserRepository } from "../../repository/userRepository";
+import { IUserRepository } from "../../repository/userRepository";
 import { Usertype } from "../../types/user";
 import { SignInValidationType } from "../../validation/signinValidation";
 import { signUpValidationType } from "../../validation/signupValidation";
+import { AuthServiceDeps } from "./authServiceDeps";
 
 export class AuthenticationService {
     private userRepository: IUserRepository;
     private hashRepository: HashRepository;
     private tokenRepository: TokenRepository;
 
-    constructor(userRepository: IUserRepository, hashRepository: HashRepository, tokenRepository: TokenRepository) {
-        this.userRepository = userRepository;
-        this.hashRepository = hashRepository;
-        this.tokenRepository = tokenRepository;
+    constructor(deps: AuthServiceDeps) {
+        this.userRepository = deps.userRepository;
+        this.hashRepository = deps.hashRepository;
+        this.tokenRepository = deps.tokenRepository;
     }
 
     async signUp({ email, password, role }: signUpValidationType) {
@@ -41,12 +42,7 @@ export class AuthenticationService {
     async signIn({ email, password }: SignInValidationType) {
         const existingUser = await this.userRepository.findByEmail(email);
 
-        if (!existingUser) {
-            throw new Error('Incorrect email or password');
-        }
-        console.log("existingUser", existingUser, existingUser.password);
-
-        if (!await this.hashRepository.compare(password, existingUser.password)){
+        if (!existingUser || !await this.hashRepository.compare(password, existingUser.password)){
             throw new Error('Incorrect email or password');
         }
 
