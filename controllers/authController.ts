@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import signupValidation from '../validation/signupValidation';
 import { AuthenticationService } from '../services/auth/authService';
 import { BcryptHashRepository } from '../repository/hashRepository';
 import { UserRepository } from '../repository/userRepository';
 import signInValidation from '../validation/signinValidation';
 import { JwtTokenRepository } from '../repository/tokenRepository';
-import { config } from '../config';
+import { config } from '../config/config';
 
 const AuthDeps = () => {        //This function returns an object containing the dependencies needed by the AuthenticationService
     return {
@@ -19,7 +19,7 @@ const AuthDeps = () => {        //This function returns an object containing the
 };
 
 //controllers are only concerned with getting request, validating, calling the right service & sending response back
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const input = signupValidation.parse(req.body);
         const authenticationService = new AuthenticationService(AuthDeps());        //•Initializing the service then •Injecting the dependencies 
@@ -34,19 +34,11 @@ export const signup = async (req: Request, res: Response) => {
         });
 
     } catch (error: unknown) {
-        let message = "An unknown error occurred";
-        if (error instanceof Error) {
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: 'error',
-            message: message
-        });
+        next(error);
     }
 }
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const input = signInValidation.parse(req.body);
 
@@ -59,15 +51,6 @@ export const login = async (req: Request, res: Response) => {
         });
 
     } catch (error) {
-        let message = "An unknown error happend";
-        if (error instanceof Error) {
-            message = error.message;
-        }
-        console.log(message);
-
-        res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }

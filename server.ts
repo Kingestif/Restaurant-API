@@ -2,7 +2,7 @@ require("dotenv").config();
 import app from './app';
 import mongoose from 'mongoose';
 import swaggerDocs from "./swagger";
-import { config } from './config';
+import { config } from './config/config';
 
 const DATABASE = config.MONGO_URI;
 const PORT:number = Number(config.PORT );

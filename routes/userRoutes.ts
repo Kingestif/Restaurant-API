@@ -1,7 +1,9 @@
+import { checkRole } from "../middlewares/userVerification";
+
 const express = require('express');
 const router = express.Router();
 const {viewAllUsers, viewUserProfile, updateUserRole, deleteUser} = require('../controllers/userController');
-const {protect, isAdmin} = require('../middlewares/userVerification');
+const {protect} = require('../middlewares/userVerification');
 
 /**
  * @swagger
@@ -34,7 +36,7 @@ const {protect, isAdmin} = require('../middlewares/userVerification');
  *       500:
  *         description: Failed to fetch users
  */
-router.route('/').get(protect, isAdmin, viewAllUsers);
+router.route('/').get(protect, checkRole(['admin']), viewAllUsers);
 
 /**
  * @swagger
@@ -135,6 +137,6 @@ router.route('/').get(protect, isAdmin, viewAllUsers);
  *       500:
  *         description: Failed to delete user
  */
-router.route('/:id').get(protect, isAdmin, viewUserProfile).patch(protect, isAdmin, updateUserRole).delete(protect, isAdmin, deleteUser);
+router.route('/:id').get(protect, checkRole(['admin']), viewUserProfile).patch(protect, checkRole(['admin']), updateUserRole).delete(protect, checkRole(['admin']), deleteUser);
 
 export default router;

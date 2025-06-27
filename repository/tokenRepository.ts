@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 export interface TokenRepository {
   generateToken: (payload: object) => string;
-  // verifyToken: (token: string, secret: string) => Promise<string>;
+  // verifyToken: (token: string, secret: string) => Promise<jwt.JwtPayload>;
 }
 
 export class JwtTokenRepository implements TokenRepository {
@@ -18,11 +18,12 @@ export class JwtTokenRepository implements TokenRepository {
     return jwt.sign(payload, this.secret, { expiresIn: this.expiresIn });
   }
 
-  // async verifyToken(token: string, secret: string): object | string {
-  //   try {
-  //     return jwt.verify(token, secret);
-  //   } catch (error) {
-  //     throw new Error('Invalid token');
+  // async verifyToken(token: string, secret: string): Promise<jwt.JwtPayload>  {
+  //   const decoded = jwt.verify(token, secret);
+  //   if(typeof decoded === 'string'){
+  //     throw new Error("Invalid token");
   //   }
+
+  //   return decoded;
   // }
 }

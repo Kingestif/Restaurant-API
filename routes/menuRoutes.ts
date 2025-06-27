@@ -1,7 +1,9 @@
+import { checkRole } from "../middlewares/userVerification";
+
 const express = require('express');
 const router = express.Router();
 const {getMenu, postMenu, editMenu, deleteMenu} = require('../controllers/menuController');
-const {protect, isManager} = require('../middlewares/userVerification');
+const {protect} = require('../middlewares/userVerification');
 
 /**
  * @swagger
@@ -74,7 +76,7 @@ const {protect, isManager} = require('../middlewares/userVerification');
  *       500:
  *         description: Server error
  */
-router.route('/').get(protect, getMenu).post(protect, isManager, postMenu);
+router.route('/').get(protect, getMenu).post(protect, checkRole(['manager']), postMenu);
 
 /**
  * @swagger
@@ -143,6 +145,6 @@ router.route('/').get(protect, getMenu).post(protect, isManager, postMenu);
  *       500:
  *         description: Failed to delete menu
  */
-router.route('/:id').patch(protect, isManager, editMenu).delete(protect, isManager, deleteMenu);
+router.route('/:id').patch(protect, checkRole(['manager']), editMenu).delete(protect, checkRole(['manager']), deleteMenu);
 
 export default router;  

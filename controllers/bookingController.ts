@@ -1,6 +1,5 @@
-import User from '../models/users';
 import Booking from '../models/booking';
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
 
 export const bookTable = async(req:Request, res:Response) => {
     try{
@@ -14,7 +13,7 @@ export const bookTable = async(req:Request, res:Response) => {
             return;
         }
         
-        const customer = req.user!._id;
+        const customer = req.user!.id;
 
         const bookingDateTime = new Date(`${date}T${time}`);
 
@@ -61,9 +60,9 @@ export const bookTable = async(req:Request, res:Response) => {
     }
 }
 
-export const getMyBookings = async(req:Request, res:Response) => {
+export const getMyBookings = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const customer = req.user!._id
+        const customer = req.user!.id;
         const myBookings = await Booking.find({customer}).populate('customer', 'name email').sort({date: 1, time: 1});
 
         res.status(200).json({
@@ -74,16 +73,7 @@ export const getMyBookings = async(req:Request, res:Response) => {
         return;
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: "error",
-            message: message
-        });
-        return;
+        next(error);
     }
 }
 

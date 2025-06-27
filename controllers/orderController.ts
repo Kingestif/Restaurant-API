@@ -5,7 +5,7 @@ import {Request, Response} from 'express';
 export const placeOrder = async(req:Request, res:Response) => {
     try{
         const {items} = req.body;
-        const customer = req.user!._id;
+        const customer = req.user!.id;
 
         let subtotal = 0;
         
@@ -52,7 +52,7 @@ export const placeOrder = async(req:Request, res:Response) => {
 
 export const getOrder = async(req:Request, res:Response) => {
     try{
-        const userId = req.user!._id;
+        const userId = req.user!.id;
 
         const order = await Order.find({ customer: userId })
             .populate('items.product', 'name price')

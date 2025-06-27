@@ -3,6 +3,7 @@ import { HashRepository } from "../../repository/hashRepository";
 import { TokenRepository } from "../../repository/tokenRepository";
 import { IUserRepository } from "../../repository/userRepository";
 import { Usertype } from "../../types/user";
+import { AppError } from "../../utils/AppError";
 import { SignInValidationType } from "../../validation/signinValidation";
 import { signUpValidationType } from "../../validation/signupValidation";
 import { AuthServiceDeps } from "./authServiceDeps";
@@ -23,7 +24,7 @@ export class AuthenticationService {
         const existingUser = await this.userRepository.findByEmail(email);
 
         if (existingUser) {
-            throw new Error("User with this email already exists");
+            throw new AppError("User with this email already exists", 401);
         }
 
         const hashedPassword = await this.hashRepository.hash(password, 12);
@@ -43,7 +44,7 @@ export class AuthenticationService {
         const existingUser = await this.userRepository.findByEmail(email);
 
         if (!existingUser || !await this.hashRepository.compare(password, existingUser.password)){
-            throw new Error('Incorrect email or password');
+            throw new AppError('Incorrect email or password', 401);
         }
 
         const token = this.tokenRepository.generateToken({email: existingUser.email});

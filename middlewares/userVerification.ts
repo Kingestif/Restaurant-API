@@ -1,94 +1,63 @@
 import User from '../models/users';
-import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
-import {IUser} from '../models/users';
-import {Request, Response, NextFunction} from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { Roles } from '../types/roles';
+import { config } from '../config/config';
+import { AppError } from '../utils/AppError';
 
-export const protect = async(req:Request, res:Response, next: NextFunction) =>{       
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
     let token = '';
-    try{
-        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')){   
+    try {
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
         }
-        
-        if(!token){
-            res.status(401).json({
-                status: "error",
-                message:"Please login to get access!"
-            });
-            return;
+
+        if (!token) {
+            throw new AppError('Please login to get access', 401);
         }
 
-        const JWT_SECRET= process.env.JWT_SECRET!;
-        if(!JWT_SECRET){
-            throw new Error("JWT_SECRET environment variable is not set");
+        const JWT_SECRET = config.JWT_SECRET;
+        if (!JWT_SECRET) {
+            throw new AppError("JWT_SECRET environment variable is not set", 500);
         }
 
-        const decoded = jwt.verify(token, JWT_SECRET);    
+        const decoded = jwt.verify(token, JWT_SECRET);
 
-        if(typeof decoded==="string"){
-            return;
+        if (typeof decoded === "string") {
+            throw new AppError('Invalid token payload', 401);
         }
 
-        const isalive = await User.findById(decoded.id);
+        const user = await User.findOne({ email: decoded.email });
 
-        if(!isalive){       
-            res.status(401).json({
-                status: "error",
-                message:"User no longer exist!"
-            });
-            return;
+        if (!user) {
+            throw new AppError('User no longer exist', 400);
         }
 
-        req.user = isalive as IUser;   //refer types folder, must add that file to tsconfig.json typeRoots attribute
+        req.user = {
+            id: user._id.toString(),
+            role: user.role as Roles
+        };   
+
         next();
 
-    }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const checkRole =  (roles: Roles[]) => {
+
+    return (req: Request, res: Response, next: NextFunction) => {
+        const currentUserRole = req?.user?.role;
+
+        if (!currentUserRole) {
+            throw new AppError('User role not found', 403);
         }
 
-        res.status(401).json({
-            status: "error",
-            message: message
-        });
-        return;
+        if (!roles.includes(currentUserRole)) {
+            throw new AppError('You are not authorized to do this operation', 403);
+        }
+
+        next();
     }
-
 }
-
-export const isCustomer = (req:Request, res:Response, next: NextFunction) =>{
-    //since we already checked req.user is right on "protect" middleware we add (!) if there was no "protect" we check if(!req.user)... 
-    if(req.user!.role !== 'customer'){
-        res.status(403).json({
-            status: "error",
-            message: "You must be a Customer to this operation",
-        });
-        return;
-    }
-    next();
-}
-
-export const isAdmin = (req:Request, res:Response, next: NextFunction) =>{
-    if(req.user!.role !== 'admin'){
-        res.status(403).json({
-            status: "error",
-            message: "You must be an Admin to do this operation",
-        });
-        return;
-    }
-    next();
-}
-
-export const isManager = (req:Request, res:Response, next: NextFunction) =>{
-    if(req.user!.role !== 'manager'){
-        res.status(403).json({
-            status: "error",
-            message: "You must be a Manager to do this operation",
-        });
-        return;
-    }
-    next();
-}
-
