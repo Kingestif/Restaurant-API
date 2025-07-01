@@ -1,59 +1,51 @@
 import { BookingService } from "../../../services/booking/bookingService";
+import { BookingRepository } from "../../../repository/bookingRepository";
+
+
+
+const bookingRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    find: jest.fn(),
+    findAll: jest.fn()
+}
+
+
 
 describe('bookingService', ()=> {
-    it('throws an error if user already book at same date and time', async() => {
-        const input = {
-            id: "123",
+    // objects like input, book, and bookingRepository are repeated across our test so initialized them once here
+    let bookingRepository: jest.Mocked<BookingRepository>;
+    let bookingService: BookingService;
+
+    let input: {
+        id: string;
+        date: string;
+        time: string;
+        numberOfPeople: number;
+    };
+
+    let book : {
+        id: string,
+        date: string,
+        time: string,
+        numberOfPeople: number,
+        customer: {
+            id: string,
+            email: string,
+        }
+    };
+
+
+    // runs before each it() helps define above ones
+    beforeEach(()=> {
+        input = {
+            id: "bookID123",
             date: "2025-06-19",
             time: "2:00",
             numberOfPeople: 4
-        }
+        };
 
-        const bookingRepository = {
-            findOne: jest.fn().mockResolvedValue({id: input.id}),
-            create: jest.fn(),
-            find: jest.fn(),
-            findAll: jest.fn()
-        }
-        const bookingService = new BookingService(bookingRepository);
-        await expect(bookingService.bookTable(input.id, new Date(input.date), input.time, input.numberOfPeople)).rejects.toThrow('You have already booked a table at this time');
-    });
-
-    it('correctly creates and returns new booking ', async ()=> {
-        const input = {
-            id: "123",
-            date: "2025-06-19",
-            time: "2:00",
-            numberOfPeople: 4
-        }
-
-        const bookingRepository = {
-            findOne: jest.fn().mockResolvedValue(null),
-            create: jest.fn().mockResolvedValue({       
-                id: input.id,
-                date: new Date(input.date),
-                time: input.time,
-                numberOfPeople: input.numberOfPeople
-            }),     
-            find: jest.fn(),
-            findAll: jest.fn()
-        }
-
-        const bookingService = new BookingService(bookingRepository);
-        const newBooking = await bookingService.bookTable(input.id, new Date(input.date), input.time, input.numberOfPeople);
-        
-        expect(newBooking).toEqual({
-            id: input.id,
-            date: new Date(input.date),
-            time: input.time,
-            numberOfPeople: input.numberOfPeople
-        });      
-    });
-
-    it('returns all booking for a user', async()=> {
-        const id = "bookID123";
-
-        const book = {
+        book = {
             id: "bookID123",
             date: "2025-06-19",
             time: "2:00",
@@ -62,52 +54,86 @@ describe('bookingService', ()=> {
                 id: 'userID456',
                 email: 'user@example.com'
             }
-        }
+        };
 
-        const bookingRepository = {
-            findOne: jest.fn().mockResolvedValue(null),
-            create: jest.fn(),    
-            find: jest.fn().mockResolvedValue(
-                [
-                    {
-                        id: book.id,
-                        date: new Date(book.date),
-                        time: book.time,
-                        numberOfPeople: book.numberOfPeople,
-                        customer: {
-                            id: book.customer.id,
-                            email: book.customer.email
-                        }
-                    }
-                ]
-            ),
-
-            // ⦿ test using inline async function (not recommended) since not jest we cant spy on it
-            
-            // find: async(id: string)=>{       
-            //     return [
-            //         {
-            //             id,
-            //             date: new Date(book.date),
-            //             time: book.time,
-            //             numberOfPeople: book.numberOfPeople,
-            //             customer: {
-            //                 id: book.customer.id,
-            //                 email: book.customer.email
-            //             }
-            //         }
-            //     ]
-            // },
-
+        bookingRepository = {
+            findOne: jest.fn(),
+            create: jest.fn(),
+            find: jest.fn(),
             findAll: jest.fn()
-        }
+        } as unknown as jest.Mocked<BookingRepository>;
 
-        const bookingService = new BookingService(bookingRepository);
-        const result = await bookingService.myBooking(id);
+        bookingService = new BookingService(bookingRepository);
+    });
+
+    it('throws an error if user already book at same date and time', async() => {
+        bookingRepository.findOne.mockResolvedValue( 
+            {
+                id: book.id,
+                date: new Date(book.date),
+                time: book.time,
+                numberOfPeople: book.numberOfPeople,
+                customer: {
+                    id: book.customer.id,
+                    email: book.customer.email
+                }
+            }
+        );
+
+        await expect(bookingService.bookTable(input.id, new Date(input.date), input.time, input.numberOfPeople)).rejects.toThrow('You have already booked a table at this time');
+    });
+
+    it('correctly creates and returns new booking ', async ()=> {
+        bookingRepository.findOne.mockResolvedValue(null);
+        bookingRepository.create.mockResolvedValue(
+            {       
+                id: input.id,
+                date: new Date(input.date),
+                time: input.time,
+                numberOfPeople: input.numberOfPeople,
+                customer: {     // ⦿ Require adding new type
+                    id: book.customer.id,
+                    email: book.customer.email
+                }
+            }
+        );
+
+        const newBooking = await bookingService.bookTable(input.id, new Date(input.date), input.time, input.numberOfPeople);
+        
+        expect(newBooking).toEqual({
+            id: input.id,
+            date: new Date(input.date),
+            time: input.time,
+            numberOfPeople: input.numberOfPeople,
+            customer: {
+                id: book.customer.id,
+                email: book.customer.email
+            }
+        });      
+    });
+
+    it('returns all booking for a user', async()=> {
+        bookingRepository.findOne.mockResolvedValue(null);
+        bookingRepository.find.mockResolvedValue(
+            [
+                {
+                    id: book.id,
+                    date: new Date(book.date),
+                    time: book.time,
+                    numberOfPeople: book.numberOfPeople,
+                    customer: {
+                        id: book.customer.id,
+                        email: book.customer.email
+                    }
+                }
+            ]
+        )
+
+        const result = await bookingService.myBooking(input.id);
 
         expect(result).toEqual([
             {
-                id: id,
+                id: book.id,
                 date: new Date(book.date),
                 time: book.time,
                 numberOfPeople: book.numberOfPeople,
@@ -120,23 +146,9 @@ describe('bookingService', ()=> {
     });
 
     it('returns all bookings', async()=> {
-        const book = {
-            id: "bookID123",
-            date: "2025-06-19",
-            time: "2:00",
-            numberOfPeople: 4,
-            customer: {
-                id: 'userID456',
-                email: 'user@example.com'
-            }
-        }
-
-        const bookingRepository = {
-            findOne: jest.fn().mockResolvedValue(null),
-            create: jest.fn(),    
-            find: jest.fn(),
-            findAll: jest.fn().mockResolvedValue(
-                [
+        bookingRepository.findOne.mockResolvedValue(null);
+        bookingRepository.findAll.mockResolvedValue(
+            [
                     {
                         id: book.id,
                         date: new Date(book.date),
@@ -147,11 +159,9 @@ describe('bookingService', ()=> {
                             email: book.customer.email
                         }
                     }
-                ]
-            )
-        }
+            ]
+        );
 
-        const bookingService = new BookingService(bookingRepository);
         const results = await bookingService.allBooking();
 
         expect(results).toEqual(
