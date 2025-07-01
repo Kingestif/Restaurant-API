@@ -1,7 +1,7 @@
 import { AuthenticationService } from "../../../services/auth/authService";
 import { Usertype } from "../../../types/user";
 
-describe("signupServie", () => {
+describe("authService", () => {
     it("throws error if user with email exists", async () => {
         const input = {
             email: "fakeuser@example.com",
