@@ -24,30 +24,21 @@ export class UserRepository implements IUserRepository {
     }
     
     async save(user: Usertype): Promise<Usertype> {
-        try {
-            const userDoc = new User({
-                email: user.email,
-                password: user.password,
-                role: user.role
-            });
+        const userDoc = new User({
+            email: user.email,
+            password: user.password,
+            role: user.role
+        });
 
-            const saved = await userDoc.save();
+        const saved = await userDoc.save();
 
-            // return {         
-            //     email: saved.email,
-            //     password: saved.password,
-            //     role: saved.role
-            // }
+        // return {         
+        //     email: saved.email,
+        //     password: saved.password,
+        //     role: saved.role
+        // }
 
-            //as our model grows returning instead of returning all fields like above we can dynamically return using object destructuring like below
-            return {...saved.toObject()} as Usertype;
-
-        } catch (error) {
-            let message = "An unknown error occurred";
-            if (error instanceof Error) {
-                message = error.message;
-            }
-            throw new Error(message);
-        }
+        //as our model grows returning instead of returning all fields like above we can dynamically return using object destructuring like below
+        return {...saved.toObject()} as Usertype;
     }
 }
