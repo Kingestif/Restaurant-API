@@ -1,35 +1,21 @@
-import Menu from '../models/menu';
 import Order from '../models/order';
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
+import { AppError } from '../utils/AppError';
+import { OrderRepository } from '../repository/orderRepository';
+import { OrderService } from '../services/order/orderService';
+import { orderValidation } from '../validation/orderValidation';
 
-export const placeOrder = async(req:Request, res:Response) => {
+export const placeOrder = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const {items} = req.body;
-        const customer = req.user!.id;
+        const orderRepository = new OrderRepository();
+        const orderService = new OrderService(orderRepository);
 
-        let subtotal = 0;
-        
-        for (let item of items) {
-            const product = await Menu.findById(item.product);
-            if (!product) {
-                return res.status(404).json({
-                    status: "error",
-                    message: `Menu item not found: ${item.product}`
-                });
-            }
-            subtotal += product.price * item.quantity;
-        }
+        const items = orderValidation.parse(req.body);
 
-        const taxRate = 0.10; // 10%
-        const tax = subtotal * taxRate;
-        const totalPrice = subtotal + tax;
+        if(!req.user) throw new AppError('unauthorize user', 403);
+        const customerID = req.user.id;
 
-
-        const newOrder = await Order.create({
-            customer,
-            items,
-            totalPrice
-        });
+        const newOrder = await orderService.placeOrder(items.items, customerID);
 
         return res.status(200).json({
             status: "success",
@@ -38,15 +24,7 @@ export const placeOrder = async(req:Request, res:Response) => {
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
