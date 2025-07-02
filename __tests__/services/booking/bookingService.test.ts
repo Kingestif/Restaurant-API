@@ -90,11 +90,7 @@ describe('bookingService', ()=> {
                 id: input.id,
                 date: new Date(input.date),
                 time: input.time,
-                numberOfPeople: input.numberOfPeople,
-                customer: {     // ⦿ Require adding new type
-                    id: book.customer.id,
-                    email: book.customer.email
-                }
+                numberOfPeople: input.numberOfPeople
             }
         );
 
@@ -104,11 +100,7 @@ describe('bookingService', ()=> {
             id: input.id,
             date: new Date(input.date),
             time: input.time,
-            numberOfPeople: input.numberOfPeople,
-            customer: {
-                id: book.customer.id,
-                email: book.customer.email
-            }
+            numberOfPeople: input.numberOfPeople
         });      
     });
 
