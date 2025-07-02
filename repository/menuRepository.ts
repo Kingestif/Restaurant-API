@@ -5,7 +5,7 @@ import { MenuType, MenuUpdateType } from "../types/menu";
 export interface IMenuRepository {
     find(): Promise<MenuType[] | null>;
     create(menu: MenuType): Promise<MenuType>;
-    findByIdAndUpdate(id: string, input: MenuUpdateType): Promise<MenuType>;
+    findByIdAndUpdate(id: string, input: MenuUpdateType): Promise<MenuType | null>;
     findByIdAndDelete(id: string): Promise<null>;
 }
 
@@ -22,11 +22,13 @@ export class MenuRepository implements IMenuRepository {
         return toMenu(newMenu);
     }
 
-    async findByIdAndUpdate(id: string, input: MenuUpdateType): Promise<MenuType> {
+    async findByIdAndUpdate(id: string, input: MenuUpdateType): Promise<MenuType | null> {
         const editedMenu = await Menu.findByIdAndUpdate(id, input, {
             new: true,
             runValidators: true
         });
+
+        if(!editedMenu) return null;
 
         return toMenu(editedMenu);
     }
