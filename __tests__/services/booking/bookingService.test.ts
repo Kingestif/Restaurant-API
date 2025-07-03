@@ -19,14 +19,14 @@ describe('bookingService', ()=> {
 
     let input: {
         id: string;
-        date: string;
+        date: Date;
         time: string;
         numberOfPeople: number;
     };
 
     let book : {
         id: string,
-        date: string,
+        date: Date,
         time: string,
         numberOfPeople: number,
         customer: {
@@ -40,14 +40,14 @@ describe('bookingService', ()=> {
     beforeEach(()=> {
         input = {
             id: "bookID123",
-            date: "2025-06-19",
+            date: new Date("2025-06-19"),
             time: "2:00",
             numberOfPeople: 4
         };
 
         book = {
             id: "bookID123",
-            date: "2025-06-19",
+            date: new Date("2025-06-19"),
             time: "2:00",
             numberOfPeople: 4,
             customer: {
@@ -67,109 +67,35 @@ describe('bookingService', ()=> {
     });
 
     it('throws an error if user already book at same date and time', async() => {
-        bookingRepository.findOne.mockResolvedValue( 
-            {
-                id: book.id,
-                date: new Date(book.date),
-                time: book.time,
-                numberOfPeople: book.numberOfPeople,
-                customer: {
-                    id: book.customer.id,
-                    email: book.customer.email
-                }
-            }
-        );
-
+        bookingRepository.findOne.mockResolvedValue(book);
         await expect(bookingService.bookTable(input.id, new Date(input.date), input.time, input.numberOfPeople)).rejects.toThrow('You have already booked a table at this time');
     });
 
     it('correctly creates and returns new booking ', async ()=> {
         bookingRepository.findOne.mockResolvedValue(null);
-        bookingRepository.create.mockResolvedValue(
-            {       
-                id: input.id,
-                date: new Date(input.date),
-                time: input.time,
-                numberOfPeople: input.numberOfPeople
-            }
-        );
+        bookingRepository.create.mockResolvedValue(input);
 
         const newBooking = await bookingService.bookTable(input.id, new Date(input.date), input.time, input.numberOfPeople);
         
-        expect(newBooking).toEqual({
-            id: input.id,
-            date: new Date(input.date),
-            time: input.time,
-            numberOfPeople: input.numberOfPeople
-        });      
+        expect(newBooking).toEqual(input);      
     });
 
     it('returns all booking for a user', async()=> {
         bookingRepository.findOne.mockResolvedValue(null);
-        bookingRepository.find.mockResolvedValue(
-            [
-                {
-                    id: book.id,
-                    date: new Date(book.date),
-                    time: book.time,
-                    numberOfPeople: book.numberOfPeople,
-                    customer: {
-                        id: book.customer.id,
-                        email: book.customer.email
-                    }
-                }
-            ]
-        )
+        bookingRepository.find.mockResolvedValue([book]);
 
         const result = await bookingService.myBooking(input.id);
 
-        expect(result).toEqual([
-            {
-                id: book.id,
-                date: new Date(book.date),
-                time: book.time,
-                numberOfPeople: book.numberOfPeople,
-                customer: {
-                    id: book.customer.id,
-                    email: book.customer.email
-                }
-            }
-        ]); 
+        expect(result).toEqual([book]); 
     });
 
     it('returns all bookings', async()=> {
         bookingRepository.findOne.mockResolvedValue(null);
-        bookingRepository.findAll.mockResolvedValue(
-            [
-                    {
-                        id: book.id,
-                        date: new Date(book.date),
-                        time: book.time,
-                        numberOfPeople: book.numberOfPeople,
-                        customer: {
-                            id: book.customer.id,
-                            email: book.customer.email
-                        }
-                    }
-            ]
-        );
+        bookingRepository.findAll.mockResolvedValue([book]);
 
         const results = await bookingService.allBooking();
 
-        expect(results).toEqual(
-            [
-                {
-                    id: book.id,
-                    date: new Date(book.date),
-                    time: book.time,
-                    numberOfPeople: book.numberOfPeople,
-                    customer: {
-                        id: book.customer.id,
-                        email: book.customer.email
-                    }
-                }
-            ]
-        );
+        expect(results).toEqual([book]);
 
     });
 });
