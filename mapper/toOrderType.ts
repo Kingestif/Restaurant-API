@@ -1,43 +1,50 @@
+import { IOrder } from "../models/order";
 import { FullPopulatedOrder, OrderType, PopulatedOrder } from "../types/order";
 
-export const toOrder = (doc: any): OrderType=> {
+export const toOrder = (doc: IOrder): OrderType=> {
     return {
-        id: doc.id.toString(),
-        customer: doc.name,
+        id: doc._id.toString(),
+        customer: doc.customer.toString(),
         totalPrice: doc.totalPrice,
-        items: doc.items
-    }
-}
-
-export const toPopulatedOrder = (doc: any): PopulatedOrder=> {
-    return {
-        id: doc.id.toString(),
-        customer: doc.name,
-        totalPrice: doc.totalPrice,
-        items: doc.item.map((i: any) => ({
-            product: {
-                id: i.product.id,
-                name: i.product.name,
-                price: i.product.price
-            }
+        items: doc.items.map((item: any) => ({
+            product: item.product.toString(), 
+            quantity: item.quantity,
+            id: item._id.toString() 
         }))
     }
 }
 
-export const toFullPopulatedOrder = (doc: any): FullPopulatedOrder=> {
+export const toPopulatedOrder = (doc: IOrder): PopulatedOrder=> {
     return {
-        id: doc.id.toString(),
-        customer: {
-            id: doc.customer.id,
-            email: doc.customer.email
+        id: doc._id.toString(),
+        customer: doc.customer.toString(),
+        totalPrice: doc.totalPrice,
+        items: doc.items.map((item: any) => ({
+            product: {
+                id: item.product._id.toString(),
+                name: item.product.name,
+                price: item.product.price,
+            },
+            quantity: item.quantity,
+        }))
+    }
+}
+
+export const toFullPopulatedOrder = (doc: IOrder): FullPopulatedOrder=> {
+    return {
+        id: doc._id.toString(),
+        customer: {         //since customer is objectId we need to ensure it's populated first and become object before we access .email
+            id: doc.customer._id.toString(),
+            email: typeof doc.customer === 'object' && doc.customer !== null? (doc.customer as any).email : ''
         },
         totalPrice: doc.totalPrice,
-        items: doc.item.map((i: any) => ({
+        items: doc.items.map((item: any) => ({
             product: {
-                id: i.product.id,
-                name: i.product.name,
-                price: i.product.price
-            }
+                id: item.product._id.toString(),
+                name: item.product.name,
+                price: item.product.price
+            },
+            quantity: item.quantity
         }))
     }
 }

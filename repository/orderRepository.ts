@@ -8,7 +8,7 @@ import { toMenu } from "../mapper/toMenuType";
 export interface IOrderRepository {
     findById(id: string): Promise<MenuType | null>;
     create(order: OrderType): Promise<OrderType>;
-    find(id: string): Promise<PopulatedOrder>;
+    find(id: string): Promise<PopulatedOrder[]>;
     findAll(): Promise<FullPopulatedOrder[]>;
 }
 
@@ -29,17 +29,17 @@ export class OrderRepository implements IOrderRepository {
         return toOrder(newOrder);
     }
 
-    async find(id: string): Promise<PopulatedOrder> {
-        const order = await Order.find({ customer: id })
+    async find(id: string): Promise<PopulatedOrder[]> {
+        const orders = await Order.find({ customer: id })
             .populate('items.product', 'name price')
             .sort({ createdAt: -1 }); 
 
-        return toPopulatedOrder(order);
+        return orders.map((order: any) => toPopulatedOrder(order));
     }
 
     async findAll(): Promise<FullPopulatedOrder[]> {
         const orders = await Order.find()
-            .populate('customer', 'name email') 
+            .populate('customer', 'email') 
             .populate('items.product', 'name price') 
             .sort({ createdAt: -1 });
 

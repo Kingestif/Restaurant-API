@@ -30,4 +30,14 @@ export class OrderService {
 
         return newOrder;
     }
+
+    async getOrder(id: string) {
+        const order = await this.orderRepository.find(id);
+        return order;
+    }
+
+    async getAllOrders(){
+        const order = await this.orderRepository.findAll();
+        return order;
+    }
 }

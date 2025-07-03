@@ -28,13 +28,16 @@ export const placeOrder = async(req:Request, res:Response, next: NextFunction) =
     }
 }
 
-export const getOrder = async(req:Request, res:Response) => {
+export const getOrder = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const userId = req.user!.id;
+        const orderRepository = new OrderRepository();
+        const orderService = new OrderService(orderRepository);
 
-        const order = await Order.find({ customer: userId })
-            .populate('items.product', 'name price')
-            .sort({ createdAt: -1 }); 
+        if(!req.user) throw new AppError('Unauthorized', 403);
+
+        const customerID = req.user.id;
+
+        const order = await orderService.getOrder(customerID);
 
         return res.status(200).json({
             status: "success",
@@ -43,25 +46,17 @@ export const getOrder = async(req:Request, res:Response) => {
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
 
-export const getAllOrders = async(req:Request, res:Response) => {
+export const getAllOrders = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const orders = await Order.find()
-            .populate('customer', 'name email') 
-            .populate('items.product', 'name price') 
-            .sort({ createdAt: -1 });
+        const orderRepository = new OrderRepository();
+        const orderService = new OrderService(orderRepository);
+
+        const orders = await orderService.getAllOrders();
 
         return res.status(200).json({
             status: "success",
@@ -70,14 +65,6 @@ export const getAllOrders = async(req:Request, res:Response) => {
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }

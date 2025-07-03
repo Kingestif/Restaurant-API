@@ -1,3 +1,9 @@
+export type ItemType = {
+    product: string,
+    quantity: number,
+    id?: string
+}
+
 export type OrderType = {
     id?: string,
     customer: string,
@@ -5,25 +11,19 @@ export type OrderType = {
     items: ItemType[]
 }
 
-export type ItemType = {
-    product: string,
-    quantity: number,
-    id?: string
-}
-
 export type PopulatedOrder = {
     id: string,
     customer: string,
     totalPrice: number,
-    items: [
+    items: {
         product: {
             id: string,
             name: string,
             price: number
         },
         quantity: number,
-        id: string
-    ]
+        id?: string
+    }[]
 }
 
 export type FullPopulatedOrder = {
@@ -33,13 +33,12 @@ export type FullPopulatedOrder = {
         email: string
     },
     totalPrice: number,
-    items: [
+    items: {
         product: {
-            id: string,
             name: string,
             price: number
         },
         quantity: number,
-        id: string
-    ]
+        id?: string
+    }[]
 }
