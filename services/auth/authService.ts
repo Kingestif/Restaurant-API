@@ -43,7 +43,7 @@ export class AuthenticationService {
     async signIn({ email, password }: SignInValidationType) {
         const existingUser = await this.userRepository.findByEmail(email);
 
-        if (!existingUser || !await this.hashRepository.compare(password, existingUser.password)){
+        if (!existingUser || !existingUser.password || !await this.hashRepository.compare(password, existingUser.password)){
             throw new AppError('Incorrect email or password', 401);
         }
 
