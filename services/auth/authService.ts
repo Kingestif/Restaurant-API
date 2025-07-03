@@ -1,7 +1,7 @@
 import { UserDTO } from "../../dto/userDTO";
 import { HashRepository } from "../../repository/hashRepository";
 import { TokenRepository } from "../../repository/tokenRepository";
-import { IUserRepository } from "../../repository/userRepository";
+import { IAuthRepository } from "../../repository/authRepository";
 import { Usertype } from "../../types/user";
 import { AppError } from "../../utils/AppError";
 import { SignInValidationType } from "../../validation/signinValidation";
@@ -9,7 +9,7 @@ import { signUpValidationType } from "../../validation/signupValidation";
 import { AuthServiceDeps } from "./authServiceDeps";
 
 export class AuthenticationService {
-    private userRepository: IUserRepository;
+    private userRepository: IAuthRepository;
     private hashRepository: HashRepository;
     private tokenRepository: TokenRepository;
 

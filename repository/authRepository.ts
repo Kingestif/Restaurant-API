@@ -3,14 +3,14 @@ import { Usertype } from "../types/user";
 
 // This interface describes what our repository must do, but not how. 
 // My business logic (service/use case) will depend on this interface.
-export interface IUserRepository {
+export interface IAuthRepository {
     findByEmail(email: string): Promise<Usertype | null>;
     save(user: Usertype): Promise<Usertype>;
 }
 
 
 // This class implements the IUserRepository interface, providing methods to interact with the user data.
-export class UserRepository implements IUserRepository {
+export class AuthRepository implements IAuthRepository {
     async findByEmail(email: string): Promise<Usertype | null> {
         const user = await User.findOne({ email });
 

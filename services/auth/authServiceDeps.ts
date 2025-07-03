@@ -1,9 +1,9 @@
 import { HashRepository } from '../../repository/hashRepository';
 import { TokenRepository } from '../../repository/tokenRepository';
-import { IUserRepository } from '../../repository/userRepository';
+import { IAuthRepository } from '../../repository/authRepository';
 
 export interface AuthServiceDeps {
-  userRepository: IUserRepository;
+  userRepository: IAuthRepository;
   hashRepository: HashRepository;
   tokenRepository: TokenRepository;
 }
