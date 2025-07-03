@@ -11,5 +11,3 @@ export const menuValidation = z.object({
 });
 
 export const updateValidation = menuValidation.partial();       //allows only part of data to be validated (follows javascript utility func, partial, omitted, required)
-// export const withoutName = menuValidation.omit({ name: true })
-
