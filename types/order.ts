@@ -35,6 +35,7 @@ export type FullPopulatedOrder = {
     totalPrice: number,
     items: {
         product: {
+            id?: string,
             name: string,
             price: number
         },
