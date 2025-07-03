@@ -1,9 +1,14 @@
-import User from '../models/users';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { UserRepository } from '../repository/userRepository';
+import { UserService } from '../services/user/userService';
+import { idValidation, roleValidation} from '../validation/userValidation';
 
-export const viewAllUsers = async(req:Request, res:Response) => {
+export const viewAllUsers = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const user = await User.find();
+        const userRepository = new UserRepository();
+        const userService = new UserService(userRepository);
+
+        const user = await userService.viewAllUsers();
 
         return res.status(200).json({
             status: "success",
@@ -11,21 +16,17 @@ export const viewAllUsers = async(req:Request, res:Response) => {
             data: user
         });
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
-export const viewUserProfile = async(req:Request, res:Response) => {
+export const viewUserProfile = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const user = await User.findById(req.params.id);
+        const userRepository = new UserRepository();
+        const userService = new UserService(userRepository);
+
+        const id = idValidation.parse(req.params.id);
+        const user = await userService.viewUserProfile(id);
 
         return res.status(200).json({
             status: "success",
@@ -33,27 +34,20 @@ export const viewUserProfile = async(req:Request, res:Response) => {
             data: user
         });
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
 
-export const updateUserRole = async(req:Request, res:Response) => {
+export const updateUserRole = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const updateData = req.body;
+        const userRepository = new UserRepository();
+        const userService = new UserService(userRepository);
+
+        const id = idValidation.parse(req.params.id);
+        const role = roleValidation.parse(req.body.role);
         
-        const user = await User.findByIdAndUpdate(req.params.id, updateData, {
-            new: true,
-            runValidators: true
-        });
+        const user = await userService.updateUserRole(id, role);
 
         return res.status(200).json({
             status: "success",
@@ -62,33 +56,23 @@ export const updateUserRole = async(req:Request, res:Response) => {
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
 
-export const deleteUser = async(req:Request, res:Response) => {
+export const deleteUser = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        await User.findByIdAndDelete(req.params.id);
+        const userRepository = new UserRepository();
+        const userService = new UserService(userRepository);
+
+        const id = idValidation.parse(req.params.id);
+
+        await userService.deleteUser(id);
+
         return res.status(204).json();
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
