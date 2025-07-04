@@ -1,13 +1,6 @@
 import { MenuRepository } from "../../../repository/menuRepository";
 import { MenuService } from "../../../services/menu/menuServices";
 
-const menuRepository = {
-    find: jest.fn(),
-    create: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    findByIdAndDelete: jest.fn()
-}
-
 describe('menuService', ()=> {
     let menuRepository: jest.Mocked<MenuRepository>;
     let menuService: MenuService;

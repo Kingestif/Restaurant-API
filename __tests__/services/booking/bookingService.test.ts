@@ -1,17 +1,6 @@
 import { BookingService } from "../../../services/booking/bookingService";
 import { BookingRepository } from "../../../repository/bookingRepository";
 
-
-
-const bookingRepository = {
-    findOne: jest.fn(),
-    create: jest.fn(),
-    find: jest.fn(),
-    findAll: jest.fn()
-}
-
-
-
 describe('bookingService', ()=> {
     // objects like input, book, and bookingRepository are repeated across our test so initialized them once here
     let bookingRepository: jest.Mocked<BookingRepository>;

@@ -2,13 +2,6 @@ import { OrderRepository } from "../../../repository/orderRepository";
 import { OrderService } from "../../../services/order/orderService";
 import { ItemType } from "../../../types/order";
 
-const orderRepository = {
-    findById: jest.fn(),
-    create: jest.fn(),
-    find: jest.fn(),
-    findAll: jest.fn(),
-}
-
 describe('orderService', ()=> {
     let orderRepository: jest.Mocked<OrderRepository>;
     let orderService: OrderService; 
