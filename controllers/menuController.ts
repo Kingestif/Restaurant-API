@@ -12,7 +12,7 @@ export const getMenu = async(req:Request, res:Response, next: NextFunction) => {
         const menu = await menuService.getMenu();
 
         return res.status(200).json({
-            success: true,
+            status: 'success',
             message: "Successfuly fetched all menus",
             data: menu || []
         });
@@ -31,7 +31,7 @@ export const postMenu = async(req:Request, res:Response, next: NextFunction) => 
         const newMenu = await menuService.postMenu(menu);
 
         return res.status(201).json({
-            success: true,
+            status: 'success',
             message: "Successfuly created new menu",
             newMenu
         });

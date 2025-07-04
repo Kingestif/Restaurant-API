@@ -26,7 +26,7 @@ export const bookTable = async(req:Request, res:Response, next: NextFunction) =>
         const book = await bookingService.bookTable(id, date, time, numberOfPeople);
         
         res.status(200).json({
-            success: true,
+            status: 'success',
             message: "Successfuly booked a table",
             table: book
         });
@@ -66,7 +66,7 @@ export const getAllBookings = async(req:Request, res:Response, next: NextFunctio
         const bookings = await bookingService.allBooking();
 
         res.status(200).json({
-            success: true,
+            status: 'success',
             results: bookings.length,
             bookings: bookings,
         });
