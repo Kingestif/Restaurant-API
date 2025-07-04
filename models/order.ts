@@ -1,6 +1,19 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
-const OrderSchema = new Schema(
+export interface IOrder extends Document {    //type for mongoose document, used to define the structure of the document in MongoDB
+  _id: Types.ObjectId;
+  customer: Types.ObjectId; 
+  totalPrice: number;
+  orderStatus: 'pending' | 'preparing' | 'delivered' | 'cancelled';
+  items: {
+    product: Types.ObjectId;
+    quantity: number;
+  }[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const OrderSchema = new Schema <IOrder>(
   {
     customer: {
       type: Schema.Types.ObjectId,

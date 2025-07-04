@@ -2,9 +2,10 @@ require("dotenv").config();
 import app from './app';
 import mongoose from 'mongoose';
 import swaggerDocs from "./swagger";
+import { config } from './config/config';
 
-const DATABASE = process.env.DATABASE;
-const PORT:number = Number(process.env.PORT );
+const DATABASE = config.MONGO_URI;
+const PORT:number = Number(config.PORT );
 
 if(!DATABASE) {
   throw new Error('DATABASE environment variable is not set');

@@ -1,7 +1,9 @@
+import { checkRole } from "../middlewares/userVerification";
+
 const express = require('express');
 const router = express.Router();
 const {placeOrder, getOrder, getAllOrders} = require('../controllers/orderController');
-const {protect, isCustomer, isManager} = require('../middlewares/userVerification');
+const {protect} = require('../middlewares/userVerification');
 
 /**
  * @swagger
@@ -74,7 +76,7 @@ const {protect, isCustomer, isManager} = require('../middlewares/userVerificatio
  *       500:
  *         description: Failed to fetch user's orders
  */
-router.route('/').post(protect, isCustomer, placeOrder).get(protect, isCustomer, getOrder);
+router.route('/').post(protect, checkRole(['customer']), placeOrder).get(protect, checkRole(['customer']), getOrder);
 
 /**
  * @swagger
@@ -107,6 +109,6 @@ router.route('/').post(protect, isCustomer, placeOrder).get(protect, isCustomer,
  *       500:
  *         description: Failed to fetch orders
  */
-router.route('/all').get(protect, isManager, getAllOrders);
+router.route('/all').get(protect, checkRole(['manager']), getAllOrders);
 
 export default router;

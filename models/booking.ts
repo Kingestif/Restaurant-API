@@ -1,27 +1,30 @@
 import { Schema, model } from 'mongoose';
 
+export interface IBooking extends Document {
+  
+}
 const BookSchema = new Schema({
-    customer: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
+  customer: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
 
-    date: {
-      type: Date,
-      required: true
-    },
+  date: {
+    type: Date,
+    required: true
+  },
 
-    time: {
-      type: String,
-      required: true
-    },
+  time: {
+    type: String,
+    required: true
+  },
 
-    numberOfPeople: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
+  numberOfPeople: {
+    type: Number,
+    required: true,
+    min: 1,
+  },
 
   },
     { timestamps: true }

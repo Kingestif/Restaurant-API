@@ -1,102 +1,84 @@
-import Menu from '../models/menu';
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
+import { MenuService } from '../services/menu/menuServices';
+import { MenuRepository } from '../repository/menuRepository';
+import { updateValidation, menuValidation } from '../validation/menuValidation';
+import { AppError } from '../utils/AppError';
 
-export const getMenu = async(req:Request, res:Response) => {
+export const getMenu = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const menu = await Menu.find();
+        const menuRepository = new MenuRepository();
+        const menuService = new MenuService(menuRepository);
+        
+        const menu = await menuService.getMenu();
+
         return res.status(200).json({
-            status: "success",
+            status: 'success',
             message: "Successfuly fetched all menus",
             data: menu || []
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
-export const postMenu = async(req:Request, res:Response) => {
+export const postMenu = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const {name, description, price, category, available} = req.body;
-        if (!name || price == null) {
-            return res.status(400).json({
-                status: "fail",
-                message: "Name and price are required fields"
-            });
-        }
+        const menuRepository = new MenuRepository();
+        const menuService = new MenuService(menuRepository);
 
-        const newMenu = await Menu.create({name, description, price, category, available});
+        const menu = menuValidation.parse(req.body);
+        const newMenu = await menuService.postMenu(menu);
 
-        
         return res.status(201).json({
-            status: "success",
+            status: 'success',
             message: "Successfuly created new menu",
-            menu: newMenu
+            newMenu
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }
 
-export const editMenu = async(req:Request, res:Response) => {
+export const editMenu = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const updateData = req.body;
+        const menuRepository = new MenuRepository();
+        const menuService = new MenuService(menuRepository);
 
-        const menu = await Menu.findByIdAndUpdate(req.params.id, updateData, {
-            new: true,
-            runValidators: true
-        });
+        // const onlyUpdate = menuValidation.partial();    //allow to send only part of data that gets updated
+        // const updateData = onlyUpdate.parse(req.body);        //validate only fields sent ubove
+        const updateData = updateValidation.parse(req.body);
+        
+        const id = req.params.id;
+        if(!id) throw new AppError('Id is required field', 400);
+
+        const updatedMenu = await menuService.editMenu(id, updateData);
 
         return res.status(200).json({
-            status: "success",
+            success: true,
             message: "Menu updated successfully",
-            data: menu
+            updatedMenu
         });
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        console.log(error);
+        next(error);
     }
 }
 
-export const deleteMenu = async(req:Request, res:Response) => {
+export const deleteMenu = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        await Menu.findByIdAndDelete(req.params.id);
+        const menuRepository = new MenuRepository();
+        const menuService = new MenuService(menuRepository);
+        
+        const id = req.params.id;
+        if(!id) throw new AppError('Id is required field', 400);
+
+        await menuService.deleteMenu(id);
         return res.status(204).json();
         
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        return res.status(500).json({
-            status: "error",
-            message: message
-        });
+        next(error);
     }
 }

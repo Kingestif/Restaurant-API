@@ -1,113 +1,78 @@
-import User from '../models/users';
-import Booking from '../models/booking';
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
+import bookingValidation from '../validation/bookingValidation';
+import { AppError } from '../utils/AppError';
+import { BookingService } from '../services/booking/bookingService';
+import { BookingRepository } from '../repository/bookingRepository';
 
-export const bookTable = async(req:Request, res:Response) => {
+export const bookTable = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const {date, time, numberOfPeople} = req.body;
+        const bookingRepository = new BookingRepository();
+        const bookingService = new BookingService(bookingRepository);
+        const {date, time, numberOfPeople} = bookingValidation.parse(req.body);
 
-        if (!date || !time || !numberOfPeople) {
-            res.status(400).json({
-                status: "fail",
-                message: "Date, time, and number of people are required",
-            });
-            return;
-        }
         
-        const customer = req.user!._id;
-
         const bookingDateTime = new Date(`${date}T${time}`);
-
         const now = new Date();
-
-        if (bookingDateTime <= now) {
-            res.status(400).json({
-                status: "fail",
-                message: "You can only book for a future date and time",
-            });
-            return;
+        
+        if(bookingDateTime <= now){
+            throw new AppError("You can only book for a future date and time", 400);
         }
         
-        const existingBooking = await Booking.findOne({customer, date, time,});
-
-        if(existingBooking){
-            res.status(409).json({
-                status: "fail",
-                message: "You have already booked a table at this time",
-            });
-            return;
+        if(!req.user){
+            throw new AppError("User not found", 403);
         }
+        const id = req.user.id;       //if error, on index.d.ts change to object and here to string
 
-        const newBooking = await Booking.create({customer, date, time, numberOfPeople });
+        const book = await bookingService.bookTable(id, date, time, numberOfPeople);
         
         res.status(200).json({
-            status: "success",
+            status: 'success',
             message: "Successfuly booked a table",
-            table: newBooking
+            table: book
         });
         return;
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: "error",
-            message: message
-        });
-        return;
+        next(error);
     }
 }
 
-export const getMyBookings = async(req:Request, res:Response) => {
+export const getMyBookings = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const customer = req.user!._id
-        const myBookings = await Booking.find({customer}).populate('customer', 'name email').sort({date: 1, time: 1});
+        const bookingRepository = new BookingRepository();
+        const bookingService = new BookingService(bookingRepository);
+
+        if(!req.user) throw new AppError("User not found", 403);
+        const id = req.user.id;
+
+
+        const myBookings = await bookingService.myBooking(id);
 
         res.status(200).json({
-            status: "success",
-            results: myBookings.length,
+            success: true,
             bookings: myBookings,
         });
         return;
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: "error",
-            message: message
-        });
-        return;
+        next(error);
     }
 }
 
-export const getAllBookings = async(req:Request, res:Response) => {
+export const getAllBookings = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const bookings = await Booking.find().populate('customer', 'name email').sort({date: 1, time: 1});
+        const bookingRepository = new BookingRepository();
+        const bookingService = new BookingService(bookingRepository);
+        const bookings = await bookingService.allBooking();
 
         res.status(200).json({
-            status: "success",
+            status: 'success',
             results: bookings.length,
             bookings: bookings,
         });
         return;
 
     }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: "error",
-            message: message
-        });
-        return;
+        next(error);
     }
 }

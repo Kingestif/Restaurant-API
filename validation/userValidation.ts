@@ -1,11 +1,6 @@
 import {z} from 'zod';
 
-const userValidation = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
-  role: z.enum(['customer', 'admin', 'manager'], {
-    message: 'Role must be one of customer, admin, or manager'
-  })
-}); 
-
-export default userValidation;
+export const idValidation = z.string().min(1, 'id is a required field');
+export const roleValidation = z.enum(['customer', 'admin', 'manager'], {
+    errorMap: () => ({ message: 'Role must be one of customer, admin, or manager' })
+});

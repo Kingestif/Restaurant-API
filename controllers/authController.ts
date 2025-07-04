@@ -1,88 +1,56 @@
-import User from '../models/users';
-import jwt from 'jsonwebtoken';
-import {Request, Response} from 'express';
-import userValidation from '../validation/userValidation';
+import { NextFunction, Request, Response } from 'express';
+import signupValidation from '../validation/signupValidation';
+import { AuthenticationService } from '../services/auth/authService';
+import { BcryptHashRepository } from '../repository/hashRepository';
+import { AuthRepository } from '../repository/authRepository';
+import signInValidation from '../validation/signinValidation';
+import { JwtTokenRepository } from '../repository/tokenRepository';
+import { config } from '../config/config';
 
-export const signup = async(req:Request,res:Response)=>{
-    
-    try{
-        const {email, password, role} = userValidation.parse(req.body);
-        const newuser = await User.create({email, password, role});
+const AuthDeps = () => {        //This function returns an object containing the dependencies needed by the AuthenticationService
+    return {
+        userRepository: new AuthRepository(),  
+        hashRepository: new BcryptHashRepository(),
+        tokenRepository: new JwtTokenRepository(
+            config.JWT_SECRET,      
+            Number(config.JWT_EXPIRE) 
+        )
+    }
+};
+
+//controllers are only concerned with getting request, validating, calling the right service & sending response back
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const input = signupValidation.parse(req.body);
+        const authenticationService = new AuthenticationService(AuthDeps());        //•Initializing the service then •Injecting the dependencies 
         
-        await newuser.save();
-
-        const userObj = newuser.toObject();
-        const { password: _password, ...userWithoutPassword } = userObj;
+        // const user = await signupService(deps, input);   //without class #1 old way
+        const user = await authenticationService.signUp(input); 
 
         res.status(201).json({
             status: 'success',
-            user: userWithoutPassword
+            message: 'User registered successfully',
+            user
         });
 
-    }catch(error:unknown){
-        let message = "An unknown error occured";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: 'error',
-            message: message
-        });
+    } catch (error: unknown) {
+        next(error);
     }
 }
 
-export const login = async(req:Request,res:Response) =>{
-    try{
-        const {email,password} = req.body;
-        console.log(email, password);
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const input = signInValidation.parse(req.body);
 
-        if(!email || !password){
-            res.status(401).json({
-                status: "error",
-                message:"Please Provide email and password",
-            });
-            return;
-        }
-
-        const user = await User.findOne({email}).select('+password');
-
-        if(!user || !await user.checkPassword(password)){
-            res.status(500).json({
-                status: "error",
-                message:"Incorrect email or password",
-            });
-            return;
-        }
-
-        const JWT_SECRET= process.env.JWT_SECRET!;
-        const JWT_EXPIRE =  Number(process.env.JWT_EXPIRE)
-        
-        if(!JWT_SECRET){
-            throw new Error("JWT_SECRET environment variable is not set");
-        }
-
-        const token = jwt.sign({id: user._id}, JWT_SECRET, {
-            expiresIn: JWT_EXPIRE ?? "" 
-        });
-
-        await user.save();
+        const authenticationService = new AuthenticationService(AuthDeps());
+        const token = await authenticationService.signIn(input);
 
         res.status(200).json({
-            status: "success",
+            status: "successfully logged in",
             token: token,
-            role: user.role
         });
 
-    }catch(error){
-        let message = "An unknown error happend";
-        if(error instanceof Error){
-            message = error.message;
-        }
-
-        res.status(500).json({
-            status: "error",
-            message: message
-        });
+    } catch (error) {
+        next(error);
     }
 }

@@ -22,8 +22,7 @@ const UserSchema = new Schema<IUser>({
     password: {
         type: String,
         required: true,
-        minlength: 8,
-        select: false
+        minlength: 8
     },
 
     role: {
@@ -35,11 +34,6 @@ const UserSchema = new Schema<IUser>({
 },
     { timestamps: true }
 );
-
-UserSchema.pre('save', async function(next){        
-    if(!this.isModified('password')) return next();
-    this.password = await hash(this.password, 12);
-});
 
 UserSchema.methods.checkPassword = function(givenPassword:string){
     console.log(this.password, givenPassword);

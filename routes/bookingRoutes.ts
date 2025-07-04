@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { bookTable, getMyBookings, getAllBookings } from '../controllers/bookingController';
-import { protect, isCustomer, isManager } from '../middlewares/userVerification';
+import { protect, checkRole } from '../middlewares/userVerification';
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ import { protect, isCustomer, isManager } from '../middlewares/userVerification'
  *       500:
  *         description: Internal server error
  */
-router.route('/').post(protect, isCustomer, bookTable).get(protect, isManager, getAllBookings);
-router.route('/me').get(protect, isCustomer, getMyBookings);
+router.route('/').post(protect, checkRole(['customer']), bookTable).get(protect, checkRole(['manager']), getAllBookings);
+router.route('/me').get(protect, checkRole(['customer']), getMyBookings);
 
 export default router;

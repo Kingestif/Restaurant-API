@@ -6,6 +6,7 @@ import menuRouter from './routes/menuRoutes';
 import userRouter from './routes/userRoutes';
 import orderRouter from './routes/orderRoutes';
 import bookingRouter from './routes/bookingRoutes';
+import { errorHandler } from "./middlewares/errorHandler";
 import morgan from 'morgan';
 import cors from 'cors';
 
@@ -18,6 +19,7 @@ app.use('/api/v1/menu', menuRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/order', orderRouter);
 app.use('/api/v1/booking', bookingRouter);
+app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
     res.send(" Service  Is  Running");
