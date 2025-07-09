@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String 
+  role Role
+  orders Order[]    //just for relation (helps when querying)
+  books Booking[]
+  createdAt DateTime @default(now())  @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  customerId Int 
+  customer User @relation(fields: [customerId], references: [id])
+  items OrderItem[]
+  totalPrice Decimal
+  orderStatus OrderStat @default(pending)
+ 
+  createdAt DateTime @default(now())  @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Menu {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  price Decimal
+  category Category
+  available Boolean @default(true)
+  orderItems OrderItem[]
+  
+  createdAt DateTime @default(now())  @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+  
+  order Order @relation(fields: [orderId], references: [id])
+  orderId Int
+
+  product Menu @relation(fields: [productId], references: [id])
+  productId Int 
+
+  quantity Int
+}
+
+model Booking {
+  id Int @id @default(autoincrement())
+  customerId Int
+  customer User @relation(fields: [customerId], references: [id])
+  date DateTime
+  time String
+  numberOfPeople Int
+
+  createdAt DateTime @default(now())  @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+enum Role {
+  customer
+  admin
+  manager
+}
+
+enum OrderStat {
+  pending
+  preparing
+  delivered
+  cancelled
+}
+
+enum Category {
+  Appetizer
+  MainCourse @map("Main Course")
+  Dessert
+  Drink
+}
+
+// In Prisma, a relation means a connection between two models using foreign keys.
+// But only one side actually stores the relation in the database — the other side is just for reading (reverse lookup)
