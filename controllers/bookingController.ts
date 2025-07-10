@@ -2,11 +2,11 @@ import {NextFunction, Request, Response} from 'express';
 import bookingValidation from '../validation/bookingValidation';
 import { AppError } from '../utils/AppError';
 import { BookingService } from '../services/booking/bookingService';
-import { BookingRepository } from '../repository/bookingRepository';
+import { BookingRepositoryMongo, BookingRepositoryPrisma } from '../repository/bookingRepository';
 
 export const bookTable = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const bookingRepository = new BookingRepository();
+        const bookingRepository = new BookingRepositoryPrisma();
         const bookingService = new BookingService(bookingRepository);
         const {date, time, numberOfPeople} = bookingValidation.parse(req.body);
 
@@ -39,7 +39,7 @@ export const bookTable = async(req:Request, res:Response, next: NextFunction) =>
 
 export const getMyBookings = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const bookingRepository = new BookingRepository();
+        const bookingRepository = new BookingRepositoryPrisma();
         const bookingService = new BookingService(bookingRepository);
 
         if(!req.user) throw new AppError("User not found", 403);
@@ -61,7 +61,7 @@ export const getMyBookings = async(req:Request, res:Response, next: NextFunction
 
 export const getAllBookings = async(req:Request, res:Response, next: NextFunction) => {
     try{
-        const bookingRepository = new BookingRepository();
+        const bookingRepository = new BookingRepositoryPrisma();
         const bookingService = new BookingService(bookingRepository);
         const bookings = await bookingService.allBooking();
 
