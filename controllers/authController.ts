@@ -46,7 +46,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const token = await authenticationService.signIn(input);
 
         res.status(200).json({
-            status: "successfully logged in",
+            status: 'success',
+            message: 'Successfully logged in',
             token: token,
         });
 
