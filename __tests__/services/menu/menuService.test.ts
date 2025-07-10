@@ -1,8 +1,8 @@
-import { MenuRepository } from "../../../repository/menuRepository";
+import { IMenuRepository } from "../../../repository/menuRepository";
 import { MenuService } from "../../../services/menu/menuServices";
 
 describe('menuService', ()=> {
-    let menuRepository: jest.Mocked<MenuRepository>;
+    let menuRepository: jest.Mocked<IMenuRepository>;
     let menuService: MenuService;
 
     let id: string;
@@ -49,7 +49,7 @@ describe('menuService', ()=> {
             create: jest.fn(),
             findByIdAndUpdate: jest.fn(),
             findByIdAndDelete: jest.fn()
-        } as unknown as jest.Mocked<MenuRepository>;
+        } as unknown as jest.Mocked<IMenuRepository>;
 
         menuService = new MenuService(menuRepository);
     });

@@ -1,8 +1,8 @@
-import { UserRepository } from "../../../repository/userRepository";
+import { IUserRepository } from "../../../repository/userRepository";
 import { UserService } from "../../../services/user/userService";
 
 describe('userService', ()=> {
-    let userRepository: jest.Mocked<UserRepository>;
+    let userRepository: jest.Mocked<IUserRepository>;
     let userService: UserService;
 
     let id: string;
@@ -29,7 +29,7 @@ describe('userService', ()=> {
             findById: jest.fn(),
             findByIdAndUpdate: jest.fn(),
             findByIdAndDelete: jest.fn()
-        } as unknown as jest.Mocked<UserRepository>
+        } as unknown as jest.Mocked<IUserRepository>
 
         userService = new UserService(userRepository);
     });
