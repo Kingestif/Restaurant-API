@@ -1,4 +1,4 @@
-import { IMenuRepository, MenuRepository } from "../../repository/menuRepository";
+import { IMenuRepository } from "../../repository/menuRepository";
 import { MenuType, MenuUpdateType } from "../../types/menu";
 import { AppError } from "../../utils/AppError";
 
