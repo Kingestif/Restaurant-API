@@ -1,9 +1,9 @@
 import { BookingService } from "../../../services/booking/bookingService";
-import { BookingRepository } from "../../../repository/bookingRepository";
+import { IBookingRepository } from "../../../repository/bookingRepository";
 
 describe('bookingService', ()=> {
     // objects like input, book, and bookingRepository are repeated across our test so initialized them once here
-    let bookingRepository: jest.Mocked<BookingRepository>;
+    let bookingRepository: jest.Mocked<IBookingRepository>;
     let bookingService: BookingService;
 
     let input: {
@@ -50,7 +50,7 @@ describe('bookingService', ()=> {
             create: jest.fn(),
             find: jest.fn(),
             findAll: jest.fn()
-        } as unknown as jest.Mocked<BookingRepository>;
+        } as unknown as jest.Mocked<IBookingRepository>;
 
         bookingService = new BookingService(bookingRepository);
     });
