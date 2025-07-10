@@ -1,9 +1,9 @@
 import { checkRole } from "../middlewares/userVerification";
 
-const express = require('express');
+import express from "express";
 const router = express.Router();
-const {getMenu, postMenu, editMenu, deleteMenu} = require('../controllers/menuController');
-const {protect} = require('../middlewares/userVerification');
+import {getMenu, postMenu, editMenu, deleteMenu} from '../controllers/menuController';
+import {protectPrisma} from '../middlewares/userVerification';
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ const {protect} = require('../middlewares/userVerification');
  *       500:
  *         description: Server error
  */
-router.route('/').get(protect, getMenu).post(protect, checkRole(['manager']), postMenu);
+router.route('/').get(protectPrisma, getMenu).post(protectPrisma, checkRole(['manager']), postMenu);
 
 /**
  * @swagger
@@ -145,6 +145,6 @@ router.route('/').get(protect, getMenu).post(protect, checkRole(['manager']), po
  *       500:
  *         description: Failed to delete menu
  */
-router.route('/:id').patch(protect, checkRole(['manager']), editMenu).delete(protect, checkRole(['manager']), deleteMenu);
+router.route('/:id').patch(protectPrisma, checkRole(['manager']), editMenu).delete(protectPrisma, checkRole(['manager']), deleteMenu);
 
 export default router;  
