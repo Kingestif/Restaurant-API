@@ -58,7 +58,11 @@ export class AuthRepositoryPrisma implements IAuthRepository {
 
         if(!user) return null;
         
-        return toUser(user);
+        return {
+            email: user.email,
+            password: user.password,
+            role: user.role as Role
+        }
     }
     
     async save(user: Usertype): Promise<Usertype> {
