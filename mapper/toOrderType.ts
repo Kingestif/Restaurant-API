@@ -1,4 +1,3 @@
-import { IOrder } from "../models/order";
 import { FullPopulatedOrder, OrderType, PopulatedOrder } from "../types/order";
 
 export const toOrder = (doc: any): OrderType=> {
