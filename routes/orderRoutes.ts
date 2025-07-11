@@ -1,9 +1,8 @@
-import { checkRole } from "../middlewares/userVerification";
-
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {placeOrder, getOrder, getAllOrders} = require('../controllers/orderController');
-const {protect} = require('../middlewares/userVerification');
+import {placeOrder, getOrder, getAllOrders} from '../controllers/orderController';
+import {protectPrisma} from '../middlewares/userVerification';
+import { checkRole } from "../middlewares/userVerification";
 
 /**
  * @swagger
@@ -76,7 +75,7 @@ const {protect} = require('../middlewares/userVerification');
  *       500:
  *         description: Failed to fetch user's orders
  */
-router.route('/').post(protect, checkRole(['customer']), placeOrder).get(protect, checkRole(['customer']), getOrder);
+router.route('/').post(protectPrisma, checkRole(['customer']), placeOrder).get(protectPrisma, checkRole(['customer']), getOrder);
 
 /**
  * @swagger
@@ -109,6 +108,6 @@ router.route('/').post(protect, checkRole(['customer']), placeOrder).get(protect
  *       500:
  *         description: Failed to fetch orders
  */
-router.route('/all').get(protect, checkRole(['manager']), getAllOrders);
+router.route('/all').get(protectPrisma, checkRole(['manager']), getAllOrders);
 
 export default router;
