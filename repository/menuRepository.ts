@@ -81,7 +81,6 @@ export class MenuRepositoryPrisma implements IMenuRepository {
     }
 
     async findByIdAndDelete(id: string): Promise<null> {
-        const menuId = await prisma.menu.findUnique({where: {id: Number(id)}});
         await prisma.menu.delete({where: {id: Number(id)}});
         return null;
     }
