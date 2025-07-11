@@ -2,14 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import signupValidation from '../validation/signupValidation';
 import { AuthenticationService } from '../services/auth/authService';
 import { BcryptHashRepository } from '../repository/hashRepository';
-import { AuthRepository } from '../repository/authRepository';
+import { AuthRepositoryMongo, AuthRepositoryPrisma } from '../repository/authRepository';
 import signInValidation from '../validation/signinValidation';
 import { JwtTokenRepository } from '../repository/tokenRepository';
 import { config } from '../config/config';
 
 const AuthDeps = () => {        //This function returns an object containing the dependencies needed by the AuthenticationService
     return {
-        userRepository: new AuthRepository(),  
+        userRepository: new AuthRepositoryPrisma(),  
         hashRepository: new BcryptHashRepository(),
         tokenRepository: new JwtTokenRepository(
             config.JWT_SECRET,      
@@ -46,7 +46,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const token = await authenticationService.signIn(input);
 
         res.status(200).json({
-            status: "successfully logged in",
+            status: 'success',
+            message: 'Successfully logged in',
             token: token,
         });
 

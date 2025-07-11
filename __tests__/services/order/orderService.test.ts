@@ -1,9 +1,9 @@
-import { OrderRepository } from "../../../repository/orderRepository";
+import { IOrderRepository } from "../../../repository/orderRepository";
 import { OrderService } from "../../../services/order/orderService";
 import { ItemType } from "../../../types/order";
 
 describe('orderService', ()=> {
-    let orderRepository: jest.Mocked<OrderRepository>;
+    let orderRepository: jest.Mocked<IOrderRepository>;
     let orderService: OrderService; 
 
     let id:string;
@@ -130,7 +130,7 @@ describe('orderService', ()=> {
             create: jest.fn(),
             find: jest.fn(),
             findAll: jest.fn(),
-        } as unknown as jest.Mocked<OrderRepository>;
+        } as unknown as jest.Mocked<IOrderRepository>;
 
         orderService = new OrderService(orderRepository);
     });

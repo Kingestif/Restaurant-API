@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { bookTable, getMyBookings, getAllBookings } from '../controllers/bookingController';
-import { protect, checkRole } from '../middlewares/userVerification';
+import { protectPrisma, checkRole } from '../middlewares/userVerification';
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ import { protect, checkRole } from '../middlewares/userVerification';
  *       500:
  *         description: Internal server error
  */
-router.route('/').post(protect, checkRole(['customer']), bookTable).get(protect, checkRole(['manager']), getAllBookings);
-router.route('/me').get(protect, checkRole(['customer']), getMyBookings);
+router.route('/').post(protectPrisma, checkRole(['customer']), bookTable).get(protectPrisma, checkRole(['manager']), getAllBookings);
+router.route('/me').get(protectPrisma, checkRole(['customer']), getMyBookings);
 
 export default router;
