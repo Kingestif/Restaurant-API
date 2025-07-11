@@ -1,9 +1,8 @@
-import { checkRole } from "../middlewares/userVerification";
-
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {viewAllUsers, viewUserProfile, updateUserRole, deleteUser} = require('../controllers/userController');
-const {protect} = require('../middlewares/userVerification');
+import {viewAllUsers, viewUserProfile, updateUserRole, deleteUser} from '../controllers/userController';
+import {protectPrisma} from '../middlewares/userVerification';
+import { checkRole } from "../middlewares/userVerification";
 
 /**
  * @swagger
@@ -36,7 +35,7 @@ const {protect} = require('../middlewares/userVerification');
  *       500:
  *         description: Failed to fetch users
  */
-router.route('/').get(protect, checkRole(['admin']), viewAllUsers);
+router.route('/').get(protectPrisma, checkRole(['admin']), viewAllUsers);
 
 /**
  * @swagger
@@ -137,6 +136,6 @@ router.route('/').get(protect, checkRole(['admin']), viewAllUsers);
  *       500:
  *         description: Failed to delete user
  */
-router.route('/:id').get(protect, checkRole(['admin']), viewUserProfile).patch(protect, checkRole(['admin']), updateUserRole).delete(protect, checkRole(['admin']), deleteUser);
+router.route('/:id').get(protectPrisma, checkRole(['admin']), viewUserProfile).patch(protectPrisma, checkRole(['admin']), updateUserRole).delete(protectPrisma, checkRole(['admin']), deleteUser);
 
 export default router;
