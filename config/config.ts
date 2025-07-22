@@ -7,7 +7,8 @@ const configSchema = z.object({
   MONGO_URI: z.string().url("MONGO_URI must be a valid URL").min(1, "MONGO_URI is required"),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_EXPIRE: z.coerce.number().min(1, "JWT_EXPIRE time is reqruired"),
-  NODE_ENV: z.string().min(1, "NODE_ENV is required")
+  NODE_ENV: z.string().min(1, "NODE_ENV is required"),
+  DB_TYPE: z.string().min(1, "DB_TYPE is required")
 });
 
 const result = configSchema.safeParse(process.env);
