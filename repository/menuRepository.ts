@@ -3,6 +3,7 @@ import { toMenu } from "../mapper/toMenuType";
 import Menu from "../models/menu";
 import prisma from "../prisma";
 import { MenuType, MenuUpdateType } from "../types/menu";
+import { client } from "../redis";
 
 export interface IMenuRepository {
     find(): Promise<MenuType[] | null>;
@@ -42,8 +43,22 @@ export class MenuRepositoryMongo implements IMenuRepository {
 
 export class MenuRepositoryPrisma implements IMenuRepository {
     async find(): Promise<MenuType[] | null> {
+
+        //cache hit! fetch from cache if data is found 
+        const cacheMenu = await client.get("MENUS");
+        if(cacheMenu) {          
+            console.log("cahe hit")
+            return JSON.parse(cacheMenu);
+        }
+
         const menu = await prisma.menu.findMany();
-        return menu.map((menu:any)=> toMenu(menu));
+        const menuData = menu.map((menu:any)=> toMenu(menu));
+
+        await client.set("MENUS", JSON.stringify(menuData), {
+            EX: 3600
+        });
+
+        return menuData
     }
 
     async create(menu: MenuType): Promise<MenuType>{
@@ -56,6 +71,7 @@ export class MenuRepositoryPrisma implements IMenuRepository {
                 available: menu.available
             }
         });
+        await client.del("MENUS");      //invalidate cache so next find() gets fresh data
         return toMenu(newMenu);
     }
 
@@ -77,11 +93,13 @@ export class MenuRepositoryPrisma implements IMenuRepository {
 
         if(!editedMenu) return null;
 
+        await client.del("MENUS");
         return toMenu(editedMenu);
     }
 
     async findByIdAndDelete(id: string): Promise<null> {
         await prisma.menu.delete({where: {id: Number(id)}});
+        await client.del("MENUS");
         return null;
     }
 }

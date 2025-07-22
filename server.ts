@@ -1,24 +1,19 @@
 require("dotenv").config();  
 import app from './app';
-import mongoose from 'mongoose';
 import swaggerDocs from "./swagger";
 import { config } from './config/config';
+import { connectRedis } from './redis';
 
-const DATABASE = config.MONGO_URI;
-const PORT:number = Number(config.PORT );
+const PORT = Number(config.PORT );
 
-if(!DATABASE) {
-  throw new Error('DATABASE environment variable is not set');
-}
-
-mongoose.connect(DATABASE).then(()=>{
-    console.log('mongoose connected');
+async function startServer() {
+    await connectRedis();
 
     swaggerDocs(app);
 
-    app.listen(PORT, ()=>{
+    app.listen(PORT, () => {
         console.log(`Server started running on port ${PORT}`);
     });
-}).catch((err)=>{
-    console.log('Database connection error', err);
-});
+}
+
+startServer();
