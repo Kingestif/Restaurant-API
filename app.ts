@@ -1,4 +1,3 @@
-const app = express();
 import { Request, Response } from "express";
 import express from 'express';
 import authRouter from './routes/authRoutes';
@@ -9,6 +8,8 @@ import bookingRouter from './routes/bookingRoutes';
 import { errorHandler } from "./middlewares/errorHandler";
 import morgan from 'morgan';
 import cors from 'cors';
+
+const app = express();
 
 app.use(cors());
 app.use(morgan('dev')); 

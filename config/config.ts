@@ -8,7 +8,8 @@ const configSchema = z.object({
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_EXPIRE: z.coerce.number().min(1, "JWT_EXPIRE time is reqruired"),
   NODE_ENV: z.string().min(1, "NODE_ENV is required"),
-  DB_TYPE: z.string().min(1, "DB_TYPE is required")
+  DB_TYPE: z.string().min(1, "DB_TYPE is required"),
+  REDIS_URL: z.string().min(1, "REDIS_URL is required")
 });
 
 const result = configSchema.safeParse(process.env);
