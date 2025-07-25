@@ -1,6 +1,7 @@
 services:
   api: 
-    build: .
+    # build: .
+    image: estifo/restaurant-api:1.0      # pull from docker hub after we pushed our dockerfile
     container_name: Myrestaurant-api
     restart: always
     ports:
