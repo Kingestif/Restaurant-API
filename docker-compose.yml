@@ -60,7 +60,7 @@ services:
   certbot:
     image: certbot/certbot
     container_name: Mycertbot
-    volumes:    # this folders are created manually on EC2 for security 
+    volumes:    
       - ./certs:/etc/letsencrypt
       - ./webroot:/var/www/certbot
 
