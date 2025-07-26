@@ -49,10 +49,25 @@ services:
       - api
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - restaurant-network
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/letsencrypt:ro
+      - ./webroot:/var/www/certbot:ro
+
+  certbot:
+    image: certbot/certbot
+    container_name: Mycertbot
+    volumes:    # this folders are created manually on EC2 for security 
+      - ./certs:/etc/letsencrypt
+      - ./webroot:/var/www/certbot
+
+    entrypoint: >
+      sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
+      --email your-email@example.com --agree-tos --no-eff-email
+      -d myrestaurant.duckdns.org"
 
 networks:
   restaurant-network:
