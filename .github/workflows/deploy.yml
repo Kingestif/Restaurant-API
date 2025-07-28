@@ -1,37 +1,37 @@
-name: Deploy to EC2
+# name: Deploy to EC2
 
-on:
-  push:
-    branches: [main]   # deploy only on pushes to main branch
+# on:
+#   push:
+#     branches: [main]   # deploy only on pushes to main branch
 
-jobs:
-  deploy:
-    runs-on: self-hosted
+# jobs:
+#   deploy:
+#     runs-on: self-hosted
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      - name: Create .env file
-        run: |
-          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
-          echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}" >> .env
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
-          echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env
-          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
+#       - name: Create .env file
+#         run: |
+#           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+#           echo "PORT=${{ secrets.PORT }}" >> .env
+#           echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env
+#           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+#           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+#           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+#           echo "JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}" >> .env
+#           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+#           echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env
+#           echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
 
-      # - name: Run Unit Tests
-      #   run: docker-compose -f docker-compose.test.yml up \
-      #     --build \
-      #     --abort-on-container-exit \
-      #     --exit-code-from app
+#       # - name: Run Unit Tests
+#       #   run: docker-compose -f docker-compose.test.yml up \
+#       #     --build \
+#       #     --abort-on-container-exit \
+#       #     --exit-code-from app
 
-      - name: Deploy with Docker Compose
-        run: |
-          docker compose down
-          docker compose up -d --build
+#       - name: Deploy with Docker Compose
+#         run: |
+#           docker compose down
+#           docker compose up -d --build
