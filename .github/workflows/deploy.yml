@@ -1,37 +1,31 @@
-# name: Deploy to EC2
+name: CI/CD Deploy to EC2
 
-# on:
-#   push:
-#     branches: [main]   # deploy only on pushes to main branch
+on:
+  push:
+    branches:
+      - main   # Triggers only when push to main branch
 
-# jobs:
-#   deploy:
-#     runs-on: self-hosted
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-#       - name: Create .env file
-#         run: |
-#           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
-#           echo "PORT=${{ secrets.PORT }}" >> .env
-#           echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env
-#           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-#           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-#           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-#           echo "JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}" >> .env
-#           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
-#           echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env
-#           echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
+    - name: SSH into EC2 and deploy
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd ~/Restaurant-API
+          echo "Pulling latest image..."
+          docker compose pull
 
-#       # - name: Run Unit Tests
-#       #   run: docker-compose -f docker-compose.test.yml up \
-#       #     --build \
-#       #     --abort-on-container-exit \
-#       #     --exit-code-from app
+          echo "Stopping old containers..."
+          docker compose down
 
-#       - name: Deploy with Docker Compose
-#         run: |
-#           docker compose down
-#           docker compose up -d --build
+          echo "Starting fresh containers..."
+          docker compose up -d --build
