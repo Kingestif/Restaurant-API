@@ -1,0 +1,24 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]   # deploy only on pushes to main branch
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # - name: Run Unit Tests
+      #   run: docker-compose -f docker-compose.test.yml up \
+      #     --build \
+      #     --abort-on-container-exit \
+      #     --exit-code-from app
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker-compose down
+          docker-compose up -d --build
