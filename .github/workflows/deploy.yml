@@ -6,8 +6,21 @@ on:
       - main   # Triggers only when push to main branch
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests using docker-compose
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+          docker compose -f docker-compose.test.yml down
+
   deploy:
     runs-on: ubuntu-latest
+    needs: test
 
     steps:
     - name: Checkout code

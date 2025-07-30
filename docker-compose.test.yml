@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      context: .
+      target: test   # only runs test stage
+    image: estifo/restaurant-api-test
+    container_name: test-app
+    env_file: .env
