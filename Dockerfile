@@ -14,11 +14,15 @@ RUN npx prisma generate
 
 RUN npm run build
 
-RUN npm prune --omit=dev
+# RUN npm prune --omit=dev
+
+# ---------- Stage 2: Test ----------
+FROM builder AS test
+CMD ["npm", "test"]
 
 # ---------- Stage 2: Runtime ----------
 
-FROM node:22.17.1-slim 
+FROM node:22.17.1-slim AS runtime
 
 WORKDIR /app
 
