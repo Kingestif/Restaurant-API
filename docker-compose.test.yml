@@ -5,4 +5,4 @@ services:
       target: test   # only runs test stage
     image: estifo/restaurant-api-test
     container_name: test-app
-    env_file: .env
+    # env_file: .env
